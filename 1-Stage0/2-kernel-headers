@@ -8,7 +8,7 @@
 make mrproper
 
 # Build the headers
-ARCH=${CMLFS_ARCH} make headers
+ARCH=x86_64 make headers
 
 # Install the headers for stage 0 clang
 find usr/include \( -name .install -o -name ..install.cmd \) -exec rm -vf {} \;

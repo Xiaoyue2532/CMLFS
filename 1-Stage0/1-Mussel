@@ -28,47 +28,47 @@ patch -Np1 -i ../patches/mussel-add-vendor.patch
 
 # If host uses clang instead of GCC,
 # Do not build ISL:
-patch -Np1 -i ../patches/mussel-dont-build-isl.patch 
+#patch -Np1 -i ../patches/mussel-dont-build-isl.patch
 
 # Apply patch to add compatibility links for cross AR and RANLIB
 patch -Np1 -i ../patches/mussel-add-missing-symlinks.patch
 
 # If compiling with LLVM, prefix commands with LLVM=1 
 # to build kernel headers
-patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch 
+#patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch
 
 # Build toolchain. Amend PATH to include /cgnutools/bin
 # o Ommit -p if not building in parallel to use all
 #   the host's CPU cores
-sudo PATH=/cgnutools/bin:$PATH ./mussel.sh x86_64 -l -o -k -p
+sudo PATH=/cgnutools/bin:$PATH ./mussel x86_64 -l -o -k -p -g
 
 # Make sure cgnutools is owned by cmlfs
-sudo chown -vR cmlfs $CMLFS/cgnutools
+sudo chown -vR arch $CMLFS/cgnutools
 
 # Unify  headers and libraries:
-mv -v /cgnutools/usr/lib/*     /cgnutools/lib/
-mv -v /cgnutools/usr/include/* /cgnutools/include/
-rm -rfv /cgnutools/usr/{include,lib}
-ln -sv ../lib     /cgnutools/usr/lib
-ln -sv ../include /cgnutools/usr/include
+#mv -v /cgnutools/usr/lib/*     /cgnutools/lib/
+#mv -v /cgnutools/usr/include/* /cgnutools/include/
+#rm -rfv /cgnutools/usr/{include,lib}
+#ln -sv ../lib     /cgnutools/usr/lib
+#ln -sv ../include /cgnutools/usr/include
 
 # Remove unneeded documentation
-rm -rf  /cgnutools/share/{man,info}
+rm -rfv /cgnutools/share/{man,info}
 
 # The new cross compiler has built-in specs which refer to the musl
-# dynamic loader  /lib/ld-musl-x86_64.so.1... which will not exist on
+# dynamic loader /lib/ld-musl-x86_64.so.1... which will not exist on
 # glibc hosts. We have to adjust this to build up the llvmtools with
 # /llvmtools/lib/ld-musl-x86_64.so.1, but keep the cross-gcc in
 # cgnutools.
-# This will be reached by creating a modified  specs  file in the
+# This will be reached by creating a modified specs file in the
 # proper location:
-export MCGV=$(/cgnutools/bin/${TARGET_TUPLE}-gcc  --version | sed 1q | cut -d' ' -f3- )
-/cgnutools/bin/${TARGET_TUPLE}-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/llvmtools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/${TARGET_TUPLE}/$MCGV/specs
+export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc  --version | sed 1q | cut -d' ' -f3- )
+/cgnutools/bin/x86_64-pc-linux-musl-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/llvmtools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/x86_64-pc-linux-musl/$MCGV/specs
 
 # Test the _tools toolchain:
 cd $CMLFS/sources
 printf "#include <stdio.h>\nint main(){}\n" > dummy.c
-${TARGET_TUPLE}-gcc dummy.c
+x86_64-pc-linux-musl-gcc dummy.c
 readelf -l a.out | grep ld
 
 # Should output:

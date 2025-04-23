@@ -2,10 +2,10 @@
 # Build and install as cmlfs
 
 # Build
-CC=${TARGET_TUPLE}-gcc  \
-CXX=${TARGET_TUPLE}-g++ \
-AR=${TARGET_TUPLE}-ar \
-RANLIB=${TARGET_TUPLE}-ranlib \
+CC=x86_64-pc-linux-musl-gcc  \
+CXX=x86_64-pc-linux-musl-g++ \
+AR=x86_64-pc-linux-musl-ar \
+RANLIB=x86_64-pc-linux-musl-ranlib \
 make PREFIX="/llvmtools"
 
 # Install to llvmtools

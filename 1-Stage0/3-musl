@@ -3,16 +3,16 @@
 
 # Configure with freshly built GCC
 ./configure \
-  CROSS_COMPILE=${TARGET_TUPLE}- \
-  --prefix=/ \
-  --target=${TARGET_TUPLE}
+    CROSS_COMPILE=x86_64-pc-linux-musl- \
+    --prefix=/ \
+    --target=x86_64-pc-linux-musl
 
 # Buid and install
-make && make DESTDIR=/llvmtools install
+make -j16 && make DESTDIR=/llvmtools install
 
 # Fix a symlink
-rm -v /llvmtools/lib/ld-musl-$(uname -m).so.1
-ln -sv libc.so /llvmtools/lib/ld-musl-$(uname -m).so.1
+rm -v /llvmtools/lib/ld-musl-x86_64.so.1
+ln -sv libc.so /llvmtools/lib/ld-musl-x86_64.so.1
 
 # Create a symlink that can be used to print
 # the required shared objects of a program or
@@ -21,10 +21,10 @@ mkdir /llvmtools/{etc,bin}
 ln -sv ../lib/libc.so /llvmtools/bin/ldd
 
 # Configure the dynamic linker
-cat > /llvmtools/etc/ld-musl-${MCA}.path <<EOF
+cat > /llvmtools/etc/ld-musl-x86_64.path <<EOF
 /llvmtools/lib
-/llvmtools/${TARGET_TUPLE}/lib
-/llvmtools/lib/${TARGET_TUPLE}
+/llvmtools/x86_64-pc-linux-musl/lib
+/llvmtools/lib/x86_64-pc-linux-musl
 EOF
 
 # Since llvmtools now has a libc, the cross GCC compiler (located
@@ -36,14 +36,13 @@ EOF
 # This will be reached by creating a modified  specs  file in the
 # proper location:
 
-export MCGV=$(/cgnutools/bin/gcc  --version | sed 1q | cut -d' ' -f3- )
-
-/cgnutools/bin/${TARGET_TUPLE}-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/llvmtools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/${TARGET_TUPLE}/$MCGV/specs
+export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -d' ' -f3- )
+/cgnutools/bin/x86_64-pc-linux-musl-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/llvmtools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/x86_64-pc-linux-musl/$MCGV/specs
 
 # Test the _tools toolchain:
 cd $CMLFS/sources
 printf "#include <stdio.h>\nint main(){}\n" > dummy.c
-${TARGET_TUPLE}-gcc dummy.c
+x86_64-pc-linux-musl-gcc dummy.c
 readelf -l a.out | grep ld
 
 # Should output:

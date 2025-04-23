@@ -6,100 +6,72 @@
 
 export CFLAGS="-fPIC -I/cgnutools/include"
 export CXXFLAGS=$CFLAGS
+export ASFLAGS=$CFLAGS
+export ASMFLAGS=$CFLAGS
 
-# Set the compiler and linker flags...
-export  CT="-DCMAKE_C_COMPILER=${TARGET_TUPLE}-clang "
-export CT+="-DCMAKE_CXX_COMPILER=${TARGET_TUPLE}-clang++ "
-export CT+="-DCMAKE_AR=/cgnutools/bin/llvm-ar "
-export CT+="-DCMAKE_NM=/cgnutools/bin/llvm-nm "
-export CT+="-DCMAKE_RANLIB=/cgnutools/bin/llvm-ranlib "
-export CT+="-DCLANG_DEFAULT_LINKER=/llvmtools/bin/ld.lld "
-
-# Set the tuples & build target ...
-export  CTG="-DLLVM_DEFAULT_TARGET_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DLLVM_HOST_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DLLVM_TARGET_ARCH=host "
-export CTG+="-DLLVM_TARGETS_TO_BUILD=Native;host "
-
-# Set the paths ...
-export  CP="-DCMAKE_INSTALL_PREFIX=/llvmtools "
-export CP+="-DDEFAULT_SYSROOT=/llvmtools "
-
-# Set options for compiler-rt
-# + avoid all the optional runtimes:
-export  CRT="-DCOMPILER_RT_BUILD_SANITIZERS=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_XRAY=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_LIBFUZZER=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_PROFILE=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_MEMPROF=OFF "
-# + Avoid need for libexecinfo:
-export CRT+="-DCOMPILER_RT_BUILD_GWP_ASAN=OFF "
-export CRT+="-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON "
-export CRT+="-DCOMPILER_RT_CXX_LIBRARY=libcxx "
-export CRT+="-DCOMPILER_RT_USE_LLVM_UNWINDER=ON "
-
-# Set options for clang
-# + Set the standard C++ library that clang will use to LLVM's libc++
-# + Set compiler-rt as default runtime
-export  CLG="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export CLG+="-DCLANG_DEFAULT_RTLIB=compiler-rt "
-export CLG+="-DCLANG_DEFAULT_UNWINDLIB=libunwind "
-export CLG+="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-
-# Set options for libc++
-export  CLCPP="-DLIBCXX_HAS_MUSL_LIBC=ON "
-export CLCPP+="-DLIBCXX_ENABLE_LOCALIZATION=ON "
-export CLCPP+="-DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON "
-export CLCPP+="-DLIBCXX_CXX_ABI=libcxxabi "
-export CLCPP+="-DLIBCXX_USE_COMPILER_RT=ON "
-export CLCPP+="-DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON "
-export CLCPP+="-DLIBCXX_ENABLE_ASSERTIONS=ON "
-
-# Set options fo libc++abi
-export  CLCPPA="-DLIBCXXABI_USE_LLVM_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_USE_COMPILER_RT=ON "
-
-# Set options for libunwind
-export  CUW="-DLIBUNWIND_INSTALL_HEADERS=ON "
-export CUW+="-DLIBUNWIND_USE_COMPILER_RT=ON "
-
-# Set LLVM options
-# + Enable Exception handling and Runtime Type Info
-export  CLLVM="-DLLVM_ENABLE_EH=ON -DLLVM_ENABLE_RTTI=ON "
-export CLLVM+="-DLLVM_ENABLE_ZLIB=ON "
-export CLLVM+="-DLLVM_INSTALL_UTILS=ON "
-export CLLVM+="-DLLVM_BUILD_LLVM_DYLIB=ON "
-export CLLVM+="-DLLVM_LINK_LLVM_DYLIB=ON "
-export CLLVM+="-DENABLE_LINKER_BUILD_ID=ON "
-export CLLVM+="-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON "
-export CLLVM+="-DLLVM_ENABLE_LIBCXX=ON "
-export CLLVM+="-DLLVM_ENABLE_LLD=ON "
-export CLLVM+="-DZLIB_INCLUDE_DIR=/llvmtools/include "
-export CLLVM+="-DZLIB_LIBRARY_RELEASE=/llvmtools/lib/libz.so "
-
-# Turn off LLVM options
-# + Turn off features host may have
-export  COFF="-DLLVM_ENABLE_ZSTD=OFF -DLLVM_ENABLE_LIBEDIT=OFF "
-export COFF+="-DLLVM_ENABLE_LIBXML2=OFF -DLLVM_ENABLE_LIBEDIT=OFF "
-export COFF+="-DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_LIBPFM=OFF "
-export COFF+="-DLLVM_INCLUDE_BENCHMARKS=OFF "
-
-# Configure source...
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_ENABLE_PROJECTS="compiler-rt;libunwind;libcxx;libcxxabi;lld;clang" \
-      -DCLANG_VENDOR="llvmtools 3.0.0" -DLLD_VENDOR="llvmtools 3.0.0" \
-      $CT $CTG $CP $CRT $CLG $CLCPP $CLCPPA $CUW $CLLVM $COFF
-
-# libunwind is now not considered as a project, but as a runtime
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
-      -DLLVM_ENABLE_PROJECTS="lld;clang" \
-      -DCLANG_VENDOR="llvmtools 4.0.0" -DLLD_VENDOR="llvmtools 4.0.0" \
-      $CT $CTG $CP $CRT $CLG $CLCPP $CLCPPA $CUW $CLLVM $COFF
+cmake ../llvm \
+    -G "Ninja" -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/llvmtools" \
+    -DCMAKE_C_COMPILER="x86_64-pc-linux-musl-clang" \
+    -DCMAKE_CXX_COMPILER="x86_64-pc-linux-musl-clang++" \
+    -DCMAKE_AR="/cgnutools/bin/llvm-ar" \
+    -DCMAKE_NM="/cgnutools/bin/llvm-nm" \
+    -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER="/llvmtools/bin/ld.lld" \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_CXX_LIBRARY=libcxx \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
+    -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
+    -DDEFAULT_SYSROOT="/llvmtools" \
+    -DENABLE_LINKER_BUILD_ID=ON \
+    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_USE_COMPILER_RT=ON \
+    -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+    -DLIBCXX_CXX_ABI=libcxxabi \
+    -DLIBCXX_ENABLE_ASSERTIONS=ON \
+    -DLIBCXX_ENABLE_LOCALIZATION=ON \
+    -DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+    -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBUNWIND_INSTALL_HEADERS=ON \
+    -DLIBUNWIND_USE_COMPILER_RT=ON \
+    -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_ENABLE_EH=ON \
+    -DLLVM_ENABLE_LIBCXX=ON \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
+    -DLLVM_ENABLE_LIBPFM=OFF \
+    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_LLD=ON \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_ZSTD=OFF \
+    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_TARGETS_TO_BUILD="Native;host" \
+    -DLLVM_TARGET_ARCH="host" \
+    -DZLIB_INCLUDE_DIR="/llvmtools/include" \
+    -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so"
+// -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON
 
 # compile
 ninja -C build

@@ -14,91 +14,66 @@ patch -Np1 -i ../patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch
 # Set the rpath
 export  CFLAGS='-fPIC -I/cgnutools/include -Wl,-rpath=/cgnutools/lib '
 export CXXFLAGS=$CFLAGS
+export ASFLAGS=$CFLAGS
+export ASMFLAGS=$CFLAGS
 
-# Set the compiler and linker flags...
-export  CT="-DCMAKE_C_COMPILER=${TARGET_TUPLE}-gcc "
-export CT+="-DCMAKE_CXX_COMPILER=${TARGET_TUPLE}-g++ "
-export CT+="-DCMAKE_AR=/cgnutools/bin/${TARGET_TUPLE}-ar "
-export CT+="-DCMAKE_NM=/cgnutools/bin/${TARGET_TUPLE}-nm "
-export CT+="-DCMAKE_RANLIB=/cgnutools/bin/${TARGET_TUPLE}-ranlib "
-export CT+="-DCLANG_DEFAULT_LINKER=/cgnutools/bin/ld.lld "
-export CT+="-DGNU_LD_EXECUTABLE=/cgnutools/bin/${CMLFS_TARGET}-ld.bfd "
+cmake ../llvm \
+    -G "Ninja" -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER="x86_64-pc-linux-musl-gcc" \
+    -DCMAKE_CXX_COMPILER="x86_64-pc-linux-musl-g++" \
+    -DCMAKE_INSTALL_PREFIX="/cgnutools" \
+    -DCMAKE_AR="/cgnutools/bin/x86_64-pc-linux-musl-ar" \
+    -DCMAKE_NM="/cgnutools/bin/x86_64-pc-linux-musl-nm" \
+    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-pc-linux-musl-ranlib" \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER="/cgnutools/bin/ld.lld" \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF \
+    -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
+    -DDEFAULT_SYSROOT="/llvmtools" \
+    -DENABLE_LINKER_BUILD_ID=ON \
+    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_USE_COMPILER_RT=OFF \
+    -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+    -DLIBCXX_CXX_ABI=libcxxabi \
+    -DLIBCXX_ENABLE_ASSERTIONS=ON \
+    -DLIBCXX_ENABLE_LOCALIZATION=ON \
+    -DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+    -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLIBCXX_USE_COMPILER_RT=OFF \
+    -DLIBUNWIND_INSTALL_HEADERS=ON \
+    -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
+    -DLLVM_ENABLE_EH=ON \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
+    -DLLVM_ENABLE_LIBPFM=OFF \
+    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_ZSTD=OFF \
+    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_TARGETS_TO_BUILD="Native;host" \
+    -DLLVM_TARGETS_TO_BUILD="host" \
+    -DLLVM_TARGET_ARCH="host"
 
-# Set the tuples & build target ...
-export  CTG="-DLLVM_DEFAULT_TARGET_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DLLVM_HOST_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE=${TARGET_TUPLE} "
-export CTG+="-DLLVM_TARGETS_TO_BUILD=host "
-export CTG+="-DLLVM_TARGET_ARCH=host "
-export CTG+="-DLLVM_TARGETS_TO_BUILD=Native;host "
-
-# Set the paths ...
-export  CP="-DCMAKE_INSTALL_PREFIX=/cgnutools "
-export CP+="-DDEFAULT_SYSROOT=/llvmtools "
-
-# Set options for compiler-rt
-# + avoid all the optional runtimes:
-export  CRT="-DCOMPILER_RT_BUILD_SANITIZERS=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_XRAY=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_LIBFUZZER=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_PROFILE=OFF "
-export CRT+="-DCOMPILER_RT_BUILD_MEMPROF=OFF "
-# + Avoid need for libexecinfo:
-export CRT+="-DCOMPILER_RT_BUILD_GWP_ASAN=OFF "
-export CRT+="-DCOMPILER_RT_USE_LLVM_UNWINDER=ON "
-export CRT+="-DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF "
-
-# Set options for clang
-# + Set the standard C++ library that clang will use to LLVM's libc++
-# + Set compiler-rt as default runtime
-export  CLG="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export CLG+="-DCLANG_DEFAULT_RTLIB=compiler-rt "
-export CLG+="-DCLANG_DEFAULT_UNWINDLIB=libunwind "
-export CLG+="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-
-# Set options for libc++
-export  CLCPP="-DLIBCXX_HAS_MUSL_LIBC=ON "
-export CLCPP+="-DLIBCXX_ENABLE_LOCALIZATION=ON "
-export CLCPP+="-DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON "
-export CLCPP+="-DLIBCXX_CXX_ABI=libcxxabi "
-export CLCPP+="-DLIBCXX_USE_COMPILER_RT=OFF "
-export CLCPP+="-DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON "
-export CLCPP+="-DLIBCXX_ENABLE_ASSERTIONS=ON "
-
-# Set options fo libc++abi
-export  CLCPPA="-DLIBCXXABI_USE_LLVM_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_USE_COMPILER_RT=OFF "
-
-# Set options for libunwind
-export  CUW="-DLIBUNWIND_INSTALL_HEADERS=ON "
-#export CUW+="-DLIBUNWIND_USE_COMPILER_RT=ON "
-
-# Set LLVM options
-# + Enable Exception handling and Runtime Type Info
-export  CLLVM="-DLLVM_ENABLE_EH=ON -DLLVM_ENABLE_RTTI=ON "
-export CLLVM+="-DLLVM_ENABLE_ZLIB=ON "
-export CLLVM+="-DLLVM_INSTALL_UTILS=ON "
-export CLLVM+="-DLLVM_BUILD_LLVM_DYLIB=ON "
-export CLLVM+="-DLLVM_LINK_LLVM_DYLIB=ON "
-export CLLVM+="-DENABLE_LINKER_BUILD_ID=ON "
-export CLLVM+="-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON "
-#export CLLVM+="-DLLVM_ENABLE_LIBCXX=ON "
-#export CLLVM+="-DLLVM_ENABLE_LLD=ON "
-
-# Turn off LLVM options
-# + Turn off features host may have
-export  COFF="-DLLVM_ENABLE_ZSTD=OFF -DLLVM_ENABLE_LIBEDIT=OFF "
-export COFF+="-DLLVM_ENABLE_LIBXML2=OFF -DLLVM_ENABLE_LIBEDIT=OFF "
-export COFF+="-DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_LIBPFM=OFF "
-
-# libunwind is now not considered as a project, but as a runtime
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
-      -DLLVM_ENABLE_PROJECTS="clang;lld" \
-      -DCLANG_VENDOR="cgnutools 4.0.0" -DLLD_VENDOR="cgnutools 4.0.0" \
-      $CT $CTG $CP $CRT $CLG $CLCPP $CLCPPA $CUW $CLLVM $COFF
+// -DLLVM_CCACHE_BUILD=ON \
 
 # compile
 ninja -C build
@@ -118,7 +93,7 @@ ninja -C build builtins # 3 targets ................................ PASS
 ninja -C build # 570 ............................................... PASS 
 
 # install to cgnutools
-cmake --install build --strip
+ninja install/strip
 
 # Make LLD the default linker
 rm -v      /cgnutools/bin/ld
@@ -128,23 +103,23 @@ ln -sv lld /cgnutools/bin/ld
 mv -v /cgnutools/lib/gcc{,-disabled}
 
 # Configure stage0 clang
-cat > /cgnutools/bin/${TARGET_TUPLE}.cfg <<EOF
+cat > /cgnutools/bin/x86_64-pc-linux-musl.cfg <<EOF
 -L/cgnutools/lib
 -nostdinc++
 -I/cgnutools/include/c++/v1
 -I/llvmtools/include
 EOF
 
-ln -sv clang-17 /cgnutools/bin/${TARGET_TUPLE}-clang
-ln -sv clang-17 /cgnutools/bin/${TARGET_TUPLE}-clang++
+ln -sv clang-18 /cgnutools/bin/x86_64-pc-linux-musl-clang
+ln -sv clang-18 /cgnutools/bin/x86_64-pc-linux-musl-clang++
 
 # Binaries built by stage0 clang will look for libc++ .
 # Add a search path for the dynamic linker/loader in llvmtools:
-echo "/cgnutools/lib" >> /llvmtools/etc/ld-musl-${MCA}.path
+echo "/cgnutools/lib" >> /llvmtools/etc/ld-musl-x86_64.path
 
 # Test stage0 Clang
 echo "int main(){}" > dummy.c
-/cgnutools/bin/${TARGET_TUPLE}-clang dummy.c -v -Wl,--verbose &> dummy.log
+/cgnutools/bin/x86_64-pc-linux-musl-clang dummy.c -v -Wl,--verbose &> dummy.log
 readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
@@ -193,7 +168,7 @@ int main() {
 }
 EOF
 
-/cgnutools/bin/${TARGET_TUPLE}-clang++ \
+/cgnutools/bin/x86_64-pc-linux-musl-clang++ \
 atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
 
 # Check for errors during compile or link:
@@ -217,7 +192,7 @@ int main(){
 }
 EOF
 
-${TARGET_TUPLE}-clang++ cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+x86_64-pc-linux-musl-clang++ cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log
@@ -228,4 +203,4 @@ grep error: cxx11-test.log
 
 # If all is good, remove build directory. Sourc tree will be re-used later
 rm -rf build dummy.* atomics-test.* cxx11-test.*
-unset CT CTG CP CRT CLG CLCPP CLCPPA CUW CLLVM COFF CFLAGS CXXFLAGS LINKERFLAGS
+unset CFLAGS CXXFLAGS ASFLAGS ASMFLAGS LINKERFLAGS
