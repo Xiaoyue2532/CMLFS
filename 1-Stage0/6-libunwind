@@ -6,7 +6,7 @@
 # o Use the monorepo source, i.e llvm-project-x.x.x.tar.xz
 
 # Source tree will be reused later. Apply patches from Chimera Linux
-find ../patches/llvm-18.1.8-chimera/ -type f -exec patch -Np1 -i {} \;
+find ../cports/main/llvm/patches/ -type f -exec patch -Np1 -i {} \;
 
 # Musl doesn't support strtoll_l(), so replace it with a simple strtoll() call.
 # Apply patches to allow localization of libc++:
@@ -59,7 +59,7 @@ ninja install-unwind-stripped
 # Remove build directory & clear flags
 # Do not remove source tree as it will be used later
 rm -rf build
-unset CXXFLAGS CFLAGS CT LINKERFLAGS
+unset CXXFLAGS CFLAGS
 
 # Set the cross-gcc spec to set the dynamic loader as
 # /llvmtools/lib/ld-musl-x86_64.so.1

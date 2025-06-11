@@ -28,8 +28,8 @@ RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
 ./configure --prefix=/llvmtools \
-            --build=${TARGET_TUPLE} \
-            --host=${TARGET_TUPLE} \
+            --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl \
             --without-bash-malloc \
             --cache-file=config.cache
 

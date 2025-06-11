@@ -3,7 +3,7 @@
 # Required by elftoolchain
 
 # Apply patch to enable xz multithreaded compression by default.
-patch -Np1 -i ../patches/libarchive-chimera/filter-xz-enable-threads.patch
+patch -Np1 -i ~/cports/main/libarchive/patches/filter-xz-enable-threads.patch
 
 # Configure source
 CC=clang \
@@ -13,16 +13,13 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=${TARGET_TUPLE} \
-            --host=${TARGET_TUPLE} \
+./configure --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl \
             --prefix=/llvmtools \
 PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
             --disable-static \
             --without-xml2 \
             --without-nettle
 
-# Compile
-make
-
-# Install to llvmtools
-make install
+# Compile and install to llvmtools
+make -j16 && make install

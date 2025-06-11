@@ -14,6 +14,9 @@ make -j16 && make DESTDIR=/llvmtools install
 rm -v /llvmtools/lib/ld-musl-x86_64.so.1
 ln -sv libc.so /llvmtools/lib/ld-musl-x86_64.so.1
 
+# fix broken llvm libcxx
+ln -sv . /llvmtools/usr
+
 # Create a symlink that can be used to print
 # the required shared objects of a program or
 # shared object

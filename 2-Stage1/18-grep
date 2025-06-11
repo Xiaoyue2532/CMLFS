@@ -9,8 +9,8 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=${TARGET_TUPLE} \
-            --host=${TARGET_TUPLE} \
+./configure --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl \
             --prefix=/llvmtools
 
 # Build and install to toolchain

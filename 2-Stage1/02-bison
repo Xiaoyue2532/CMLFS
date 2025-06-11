@@ -1,5 +1,7 @@
-# Stage 1: flex
-# Build and install as cmlfs
+# Stage 1: bison
+# Build as cmlfs
+#
+# Use GNU Bison
 
 # Configure source
 CC=clang CXX=clang++ \
@@ -17,6 +19,3 @@ make -j16
 
 # Install to llvmtools
 make install
-
-# Create a compatibility link
-ln -sv flex /llvmtools/bin/lex

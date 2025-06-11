@@ -38,8 +38,7 @@ patch -Np1 -i ../patches/mussel-add-missing-symlinks.patch
 #patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch
 
 # Build toolchain. Amend PATH to include /cgnutools/bin
-# o Ommit -p if not building in parallel to use all
-#   the host's CPU cores
+# o Omit -p if not building in parallel to use all the host's CPU cores
 sudo PATH=/cgnutools/bin:$PATH ./mussel x86_64 -l -o -k -p -g
 
 # Make sure cgnutools is owned by cmlfs

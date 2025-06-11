@@ -4,12 +4,12 @@
 # o Reuse llvm-project source tree from before
 #
 
-export CFLAGS="-fPIC -I/cgnutools/include"
-export CXXFLAGS=$CFLAGS
-export ASFLAGS=$CFLAGS
-export ASMFLAGS=$CFLAGS
+# Restore -nostdlibc changes
 
-cmake ../llvm \
+export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
+export CXXFLAGS=$CFLAGS
+
+cmake \
     -G "Ninja" -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/llvmtools" \
@@ -19,9 +19,9 @@ cmake ../llvm \
     -DCMAKE_NM="/cgnutools/bin/llvm-nm" \
     -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DCLANG_DEFAULT_LINKER="/llvmtools/bin/ld.lld" \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCLANG_DEFAULT_LINKER="/llvmtools/bin/ld.lld" \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
     -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
     -DCOMPILER_RT_BUILD_MEMPROF=OFF \
@@ -34,33 +34,28 @@ cmake ../llvm \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
     -DDEFAULT_SYSROOT="/llvmtools" \
     -DENABLE_LINKER_BUILD_ID=ON \
-    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=OFF \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
-    -DLIBCXX_ENABLE_ASSERTIONS=ON \
-    -DLIBCXX_ENABLE_LOCALIZATION=ON \
-    -DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON \
-    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=OFF \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
     -DLIBCXX_USE_COMPILER_RT=ON \
-    -DLIBUNWIND_INSTALL_HEADERS=ON \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
+    -DLLVM_ENABLE_ASSERTIONS=ON \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
-    -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
     -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=OFF \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
@@ -69,12 +64,15 @@ cmake ../llvm \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH="host" \
+    -DLLVM_CCACHE_BUILD=ON \
     -DZLIB_INCLUDE_DIR="/llvmtools/include" \
-    -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so"
-// -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON
+    -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so" \
+    ../llvm
+
+// -DLLVM_ENABLE_LLD=ON \
 
 # compile
-ninja -C build
+ninja
 
 # For troubleshooting, this is the breakdown of build targets:
 ninja -C build llvm-headers # 202 targets .................. PASS
@@ -91,17 +89,17 @@ ninja -C build libclang # .... 31 .......................... PASS
 ninja -C build # ............ 508 .......................... PASS
 
 # install to llvmtools
-cmake --install build --strip
+ninja install/strip
 
 # Make LLD the default linker
 ln -sv lld /llvmtools/bin/ld
 
 # Many packages use the name cc to call the C compiler. To
 # satisfy those packages, create a symlink
-ln -sv clang-17 /llvmtools/bin/cc
+ln -sv clang-19 /llvmtools/bin/cc
 
 # Clear variables used in the CMake invocation:
-unset CFLAGS CXXFLAGS CT CTG CP CRT CLG CLCPP CLCPPA CUW CLLVM COFF
+unset CFLAGS CXXFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
 export PATH=/llvmtools/bin:/bin:/usr/bin
@@ -211,14 +209,17 @@ grep error: cxx11-test.log
 llvm-readelf -d /llvmtools/lib/libunwind.so.1.0  | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 llvm-readelf -d /llvmtools/lib/libc++.so.1.0  | grep Shared | cut -b 37-
+# Shared library: [libc++abi.so.1]
+# Shared library: [libunwind.so.1]
 # Shared library: [libc.so]
 llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0  | grep Shared | cut -b 37-
+# Shared library: [libunwind.so.1]
 # Shared library: [libc.so]
-llvm-readelf -d /llvmtools/lib/libLLVM-17.0.5.so | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libLLVM-19.so | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libc++.so.1]
 # Shared library: [libc.so]
 
 # If all is well, clean up
 rm -rf build dummy.* atomics-test.* cxx11-test.*
-unset CT CTG CP CRT CLG CLCPP CLCPPA CUW CLLVM COFF CFLAGS CXXFLAGS
+unset CFLAGS CXXFLAGS

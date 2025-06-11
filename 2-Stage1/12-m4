@@ -10,8 +10,8 @@ RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
 ./configure --prefix=/llvmtools \
-            --build=${MLFS_HOST} \
-            --host=${TARGET_TUPLE} 
+            --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl
 
 # Build and install to toolchain
-make && make install
+make -j16 && make install

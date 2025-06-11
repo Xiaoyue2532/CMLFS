@@ -7,25 +7,22 @@
 #   avoid duplicate building of packages.
 
 # Force clang to use dynamic linux loader in /llvmtools
-patch -Np1 -i ../patches/llvm-cmlfs/modify-toolchain-dynamic-loader.llvmtools.patch 
-patch -Np1 -i ../patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch 
+patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.llvmtools.patch
+patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch
 
-# Built llvm-tblgen will need libstdc++.so.6 & libgcc_s.so.1.
-# Set the rpath
-export  CFLAGS='-fPIC -I/cgnutools/include -Wl,-rpath=/cgnutools/lib '
+export CFLAGS="-fPIC "
 export CXXFLAGS=$CFLAGS
-export ASFLAGS=$CFLAGS
-export ASMFLAGS=$CFLAGS
 
-cmake ../llvm \
+cmake \
     -G "Ninja" -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_C_COMPILER="x86_64-pc-linux-musl-gcc" \
     -DCMAKE_CXX_COMPILER="x86_64-pc-linux-musl-g++" \
     -DCMAKE_INSTALL_PREFIX="/cgnutools" \
-    -DCMAKE_AR="/cgnutools/bin/x86_64-pc-linux-musl-ar" \
-    -DCMAKE_NM="/cgnutools/bin/x86_64-pc-linux-musl-nm" \
-    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-pc-linux-musl-ranlib" \
+    -DCMAKE_AR="/cgnutools/bin/x86_64-pc-linux-musl-gcc-ar" \
+    -DCMAKE_NM="/cgnutools/bin/x86_64-pc-linux-musl-gcc-nm" \
+    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-pc-linux-musl-gcc-ranlib" \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_DEFAULT_LINKER="/cgnutools/bin/ld.lld" \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
@@ -55,25 +52,23 @@ cmake ../llvm \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi" \
     -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_EH=ON \
-    -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
     -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
     -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=OFF \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_INSTALL_UTILS=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
-    -DLLVM_TARGETS_TO_BUILD="host" \
-    -DLLVM_TARGET_ARCH="host"
-
-// -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGET_ARCH="host" \
+    ../llvm
 
 # compile
 ninja -C build
@@ -90,7 +85,27 @@ ninja -C build libclang # 31 targets ............................... PASS
 ninja -C build compiler-rt # 5 targets ............................. PASS
 ninja -C build unwind # 5 targets .................................. PASS
 ninja -C build builtins # 3 targets ................................ PASS
-ninja -C build # 570 ............................................... PASS 
+ninja -C build # 570 ............................................... PASS
+
+# LLVM-19.1.7 support is still weird
+rm /cgnutools/bin/{ld,llvm-strip}
+ln -s build/bin/ld.lld /cgnutools/bin/ld
+ln -s build/bin/llvm-strip /cgnutools/bin/llvm-strip
+
+# Fix broken libunwind
+ln -s /cgnutools/lib/libunwind.so.1.0 /llvmtools/lib/libunwind.so.1.0
+ln -s libunwind.so.1.0 /llvmtools/lib/libunwind.so.1
+ln -s libunwind.so.1 /llvmtools/lib/libunwind.so
+
+# Fix broken libc++
+ln -s /cgnutools/lib/libc++.so.1.0 /llvmtools/lib/libc++.so.1.0
+ln -s libc++.so.1.0 /llvmtools/lib/libc++.so.1
+ln -s libc++.so.1 /llvmtools/lib/libc++.so
+
+# Fix broken libc++abi
+ln -s /cgnutools/lib/libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1.0
+ln -s libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1
+ln -s libc++abi.so.1 /llvmtools/lib/libc++abi.so
 
 # install to cgnutools
 ninja install/strip
@@ -110,8 +125,8 @@ cat > /cgnutools/bin/x86_64-pc-linux-musl.cfg <<EOF
 -I/llvmtools/include
 EOF
 
-ln -sv clang-18 /cgnutools/bin/x86_64-pc-linux-musl-clang
-ln -sv clang-18 /cgnutools/bin/x86_64-pc-linux-musl-clang++
+ln -sv clang-19 /cgnutools/bin/x86_64-pc-linux-musl-clang
+ln -sv clang-19 /cgnutools/bin/x86_64-pc-linux-musl-clang++
 
 # Binaries built by stage0 clang will look for libc++ .
 # Add a search path for the dynamic linker/loader in llvmtools:
@@ -148,10 +163,10 @@ grep ld.lld:  dummy.log
 # ld.lld: /llvmtools/lib/crtn.o
 
 # Verify that stage0 clang is searching for the correct header files:
-grep -B2 -A1 '^ /llvmtools/include' dummy.log
+grep -B2 -A1 '^ /llvmtools/usr/include' dummy.log
 # It should output in this order:
 # /cgnutools/include/c++/v1
-# /llvmtools/include
+# /llvmtools/usr/include
 # /mnt/cmlfs/cgnutools/lib/clang/15.0.6/include
 # NOTE: The libc++ headers should be searched first before any other header directories.
 
@@ -203,4 +218,3 @@ grep error: cxx11-test.log
 
 # If all is good, remove build directory. Sourc tree will be re-used later
 rm -rf build dummy.* atomics-test.* cxx11-test.*
-unset CFLAGS CXXFLAGS ASFLAGS ASMFLAGS LINKERFLAGS
