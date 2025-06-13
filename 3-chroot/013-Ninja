@@ -13,7 +13,10 @@ sed -i '/int Guess/a \
 ' src/ninja.cc
 
 # Configure source with cmake:
-cmake -B OUT  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/llvmtools
+cmake -B OUT \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/llvmtools \
+    -DBUILD_TESTING=OFF
 
 # Compile
 make -C OUT 

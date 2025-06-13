@@ -2,11 +2,11 @@
 # Build under chroot
 
 # Apply fixes to build under musl
-patch -Np0 -i ../patches/python-alpine/musl-find_library.patch 
+find ../../cports/main/python/patches/ -type f -exec patch -Np1 -i {} \;
 
 # If adding optional python-based tools to toolchain, like
 # meson, make sure pip3 is built
-export PI="--with-ensurepip=yes "
+# export PI="--with-ensurepip=yes "
 # Otherwise:
 export PI="--without-ensurepip "
 
@@ -18,14 +18,15 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=${TUPLE} \
-            --host=${TUPLE}  \
+./configure --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl  \
             --prefix=/llvmtools      \
             --enable-shared $PI
 
 # Build and install to toolchain
-make && make install
-chmod -v 755 /llvmtools/lib/libpython3.12.so &&
+make -j16 && make install
+
+chmod -v 755 /llvmtools/lib/libpython3.14.so &&
 chmod -v 755 /llvmtools/lib/libpython3.so 
 
 unset PI 

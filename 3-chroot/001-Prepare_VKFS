@@ -1,7 +1,7 @@
 # Prepare Virtual Kernel Filesystems for chroot
 # This section is done by root
 
-export CMLFS=/mnt/cmlfs
+export CMLFS=/mnt1
 
 # Create directories and nodes
 mkdir -pv $CMLFS/{dev,proc,sys,run}

@@ -1,0 +1,37 @@
+# Chroot: CMake 
+# Build and install under chroot
+
+# Configure source with clang
+CC=clang \
+CXX=clang++ \
+AR=llvm-ar \
+AS=llvm-as \
+RANLIB=llvm-ranlib \
+LD=ld.lld \
+STRIP=llvm-strip \
+./bootstrap \
+    --prefix=/llvmtools \
+    --mandir=/share/man \
+    --docdir=/share/doc/cmake-3.28.6 \
+    --no-system-jsoncpp \
+    --no-system-librhash \
+    --no-system-curl \
+    --no-system-libarchive \
+    --no-system-nghttp2 \
+    --no-system-expat \
+    --no-system-zlib \
+    --no-system-zstd \
+    --no-system-libuv \
+    --parallel=16 \
+    -- \
+    -DCMAKE_USE_OPENSSL=OFF \
+    -DBUILD_CursesDialog=ON \
+    -DCURSES_CURSES_LIBRARY=/llvmtools/lib/libcursesw.so \
+    -DCURSES_EXTRA_LIBRARY=/llvmtools/lib/libtinfow.so \
+    -DCURSES_FORM_LIBRARY=/llvmtools/lib/libformw.so \
+    -DCURSES_INCLUDE_PATH=/llvmtools/include/ncursesw \
+    -DCURSES_NCURSES_LIBRARY=/llvmtools/lib/libncursesw.so
+
+
+# Build and install to toolchain
+make -j16 && make install

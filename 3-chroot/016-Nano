@@ -4,7 +4,7 @@
 
 # Set flags, so curses headers can be found in /llvmtools/include
 export LDFLAGS="-L/llvmtools/lib -lncursesw "
-export CPPFLAGS="-I/llvmtools/include"
+export CPPFLAGS="-I/llvmtools/include/ncursesw "
 
 # Configure source with clang
 CC=clang \
@@ -14,12 +14,12 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=${TUPLE} \
-            --host=${TTUPLE} \
+./configure --build=x86_64-pc-linux-musl \
+            --host=x86_64-pc-linux-musl \
             --prefix=/llvmtools \
             --enable-tiny
 
 # Build and install to toolchain
-make && make install
+make -j16 && make install
 
 unset LDFLAGS CPPFLAGS

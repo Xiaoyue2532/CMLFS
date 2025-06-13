@@ -30,9 +30,8 @@ RANLIB=llvm-ranlib \
     --disable-stripping \
     AWK=gawk
 
-make -j16
 # Install to llvmtools
-make TIC_PATH=$(pwd)/build/progs/tic install
+make -j16 && make TIC_PATH=$(pwd)/build/progs/tic install
 
 ln -sv libncursesw.so /llvmtools/lib/libncurses.so
 sed -e 's/^#if.*XOPEN.*$/#if 1/' \
@@ -40,5 +39,8 @@ sed -e 's/^#if.*XOPEN.*$/#if 1/' \
 
 # Some packages may not configure with the curses library
 # in llvmtools. Create a compatibility links:
-ln -sv  libcurses.so  /llvmtools/lib/libtinfo.so
-ln -sv  libcurses.so  /llvmtools/lib/libtinfow.so
+ln -sv libncurses.so  /llvmtools/lib/libtinfo.so
+ln -sv libncurses.so  /llvmtools/lib/libtinfow.so
+
+# fix python cannot find term.h
+ln -s ncursesw/term.h /llvmtools/include/term.h
