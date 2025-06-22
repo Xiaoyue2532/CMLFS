@@ -6,7 +6,7 @@ CC=x86_64-pc-linux-musl-gcc  \
 CXX=x86_64-pc-linux-musl-g++ \
 AR=x86_64-pc-linux-musl-ar \
 RANLIB=x86_64-pc-linux-musl-ranlib \
-make PREFIX="/llvmtools"
+make PREFIX="/llvmtools" -j`nproc --all`
 
 # Install to llvmtools
 make PREFIX="/llvmtools" install

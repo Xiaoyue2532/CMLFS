@@ -9,37 +9,47 @@ case $(uname -m) in
 esac
 
 # Fix the paths for utmp and wtmp:
-patch -Np1 -i ../patches/musl-mlfs/fix-utmp-wtmp-paths.patch
-
-# Harden musl libc with scudo from compiler-rt
-# o Extract compiler-rt
-cd .. && tar xf pkgs/compiler-rt-17.0.5.src.tar.xz
-
-# o Copy over scudo from compiler-rt
-cd -  && mkdir -pv src/malloc/scudo/scudo
-for t in cpp h inc
-do
-  cp -rv ../compiler-rt-17.0.5.src/lib/scudo/standalone/*.$t src/malloc/scudo/
-done
-cp -rv ../compiler-rt-17.0.5.src/lib/scudo/standalone/include/scudo/interface.h \
-       src/malloc/scudo/scudo/
-# o Remove wrappers ...
-rm -v src/malloc/scudo/wrappers_c*
-
-# o ...to add wrappers from Chimera Linux
-cp -v ../files/musl-chimera/wrappers.cpp src/malloc/scudo/
+patch -Np1 -i ../../CMLFS/patches/musl-mlfs/fix-utmp-wtmp-paths.patch
 
 # o Apply patches from Chimera Linux
-patch -Np1 -i ../patches/musl-chimera/0001-scudo-add-necessary-plumbing.patch
-patch -Np1 -i ../patches/musl-chimera/0002-scudo-clean-up-lingering-weak-symbols-we-don-t-want.patch
-patch -Np1 -i ../patches/musl-chimera/0003-do-not-rely-on-system-headers-for-cpu-info.patch
-patch -Np1 -i ../patches/musl-chimera/libcc-compiler-rt.patch
-patch -Np1 -i ../patches/musl-chimera/lto.patch
-patch -Np1 -i ../patches/musl-chimera/mo_lookup.patch
-patch -Np1 -i ../patches/musl-chimera/plt.patch
-patch -Np1 -i ../patches/musl-chimera/lfs64.patch 
-patch -Np1 -i ../patches/musl-chimera/lfs64-2.patch 
-patch -Np1 -i ../patches/musl-chimera/mntent-unescape.patch 
+patch -Np1 -i ../../cports/main/musl/patches/lto.patch
+patch -Np1 -i ../../cports/main/musl/patches/fix-bind-textdomain-codeset.patch
+patch -Np1 -i ../../cports/main/musl/patches/iconv-001.patch
+patch -Np1 -i ../../cports/main/musl/patches/iconv-002.patch
+patch -Np1 -i ../../cports/main/musl/patches/libcc-compiler-rt.patch
+patch -Np1 -i ../../cports/main/musl/patches/loongarch-tlsdesc.patch
+patch -Np1 -i ../../cports/main/musl/patches/plt.patch
+patch -Np1 -i ../../cports/main/musl/patches/llvm18.patch
+patch -Np1 -i ../../cports/main/musl/patches/ppc-alt.patch
+patch -Np1 -i ../../cports/main/musl/patches/riscv-hwprobe.patch
+patch -Np1 -i ../../cports/main/musl/patches/default-locpath.patch
+
+# Configure
+CC=clang \
+LD=ld.lld \
+AR=llvm-ar \
+RANLIB=llvm-ranlib \
+AS=llvm-as \
+LIBCC="/llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a " \
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --disable-gcc-wrapper \
+    --enable-debug
+
+# Build and install 
+make -j`nproc --all` && make install
+
+# Provide minimal libssp_nonshared.a so we don't need libssp from gcc
+export CFLAGS="-Wno-implicit-int"
+clang -fpie $CFLAGS -c ../../CMLFS/files/musl-alpine/__stack_chk_fail_local.c -o __stack_chk_fail_local.o
+llvm-ar r libssp_nonshared.a __stack_chk_fail_local.o
+cp -v libssp_nonshared.a /usr/lib/
+unset CFLAGS
+
+# Create link for ldd:
+ln -sv ../lib/libc.so /usr/bin/ldd
 
 # Set the CPU architechture
 case $(uname -m) in
@@ -48,32 +58,6 @@ case $(uname -m) in
      arm*) export CARCH="arm"     ;;
   aarch64) export CARCH="aarch64" ;;
 esac
-
-# Configure
-CC=clang CXX=clang++  \
-LD=ld.lld             \
-AR=llvm-ar            \
-RANLIB=llvm-ranlib    \ 
-AS=llvm-as            \
-LIBCC_LDFLAGS="--rtlib=compiler-rt " \
-./configure --prefix=/usr         \
-            --sysconfdir=/etc     \
-            --localstatedir=/var  \
-            --disable-gcc-wrapper \
-             -enable-debug
-
-# Build and install 
-make && make  install
-
-# Provide minimal libssp_nonshared.a so we don't need libssp from gcc
-export CFLAGS="-Wno-implicit-int"
-clang -fpie $CFLAGS -c ../files/musl-alpine/__stack_chk_fail_local.c -o __stack_chk_fail_local.o
-llvm-ar r libssp_nonshared.a __stack_chk_fail_local.o
-cp -v libssp_nonshared.a /usr/lib/
-unset CFLAGS
-
-# Create link for ldd:
-ln -sv ../lib/libc.so /usr/bin/ldd
 
 # Create config for dynamic library loading:
 cat > /etc/ld-musl-$CARCH.path <<EOF
@@ -92,7 +76,7 @@ esac
 # without directly modifying the ld-musl-$ARCH.path file.
 # If not using package managers, simply create ldconfig as a link
 # to true
-install -v -D -m755 ../files/ldconfig /usr/sbin/
+install -v -D -m755 ../../CMLFS/files/ldconfig /usr/sbin/
 chmod -v +x /usr/sbin/ldconfig
 mkdir -pv $BUILD/etc/ld-musl-${CARCH}.d
 cat > $BUILD/etc/ld-musl-${CARCH}.d/default <<EOF

@@ -15,8 +15,5 @@ AR=llvm-ar NM=llvm-nm \
             --without-nettle \
             --without-expat 
 
-# Compile
-make
-
-# Install
-make install
+# Compile and install
+make -j`nproc --all` && make install

@@ -5,4 +5,4 @@
 ./configure --prefix=/usr
 
 # Build and install
-make && make install
+make -j`nproc --all` && make install

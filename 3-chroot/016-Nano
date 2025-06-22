@@ -14,12 +14,13 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=x86_64-pc-linux-musl \
-            --host=x86_64-pc-linux-musl \
-            --prefix=/llvmtools \
-            --enable-tiny
+./configure \
+    --build=x86_64-pc-linux-musl \
+    --host=x86_64-pc-linux-musl \
+    --prefix=/llvmtools \
+    --enable-tiny
 
 # Build and install to toolchain
-make -j16 && make install
+make -j`nproc --all` && make install
 
 unset LDFLAGS CPPFLAGS

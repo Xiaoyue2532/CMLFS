@@ -17,4 +17,4 @@ STRIP=llvm-strip \
             --disable-libseccomp
 
 # Build and install to toolchain
-make && make install
+make -j`nproc --all` && make install

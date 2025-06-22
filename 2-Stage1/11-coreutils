@@ -27,11 +27,12 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --build=x86_64-pc-linux-musl \
-            --host=x86_64-pc-linux-musl \
-            --prefix=/llvmtools \
-            --enable-install-program=hostname \
-            --cache-file=config.cache
+./configure \
+    --prefix=/llvmtools \
+    --build=x86_64-pc-linux-musl \
+    --host=x86_64-pc-linux-musl \
+    --enable-install-program=hostname \
+    --cache-file=config.cache
 
 # Build and install to toolchain
-make && make install
+make -j`nproc --all` && make install

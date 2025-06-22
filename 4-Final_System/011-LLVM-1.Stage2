@@ -4,117 +4,85 @@
 # NOTE: Reuse llvm-project source tree from before
 
 # Restore default dynamic linker/loader path to /lib
-patch -Np1 -i ../patches/llvm-cmlfs/modify-test-dynamic-loader.restore.patch 
-patch -Np1 -i ../patches/llvm-cmlfs/modify-toolchain-dynamic-loader.restore.patch  
+patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.restore.patch 
+patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.restore.patch  
 
 # stage1 clang cannot find zstd headers
 ln -sv /usr/include/zstd.h  /llvmtools/include/
 
+ln -sv /llvmtools/bin/python3 /usr/bin/python3
+
 export CFLAGS="-fPIC "
 export CXXFLAGS=$CFLAGS
 
-# Set the compiler and linker flags...
-export  CT="-DCMAKE_C_COMPILER=clang "
-export CT+="-DCMAKE_CXX_COMPILER=clang++ "
-export CT+="-DCMAKE_AR=/llvmtools/bin/llvm-ar "
-export CT+="-DCMAKE_NM=/llvmtools/bin/llvm-nm "
-export CT+="-DCMAKE_RANLIB=/llvmtools/bin/llvm-ranlib "
-export CT+="-DCLANG_DEFAULT_LINKER=/usr/bin/ld.lld "
-
-# Set the tuples & build target ...
-export  CTG="-DLLVM_DEFAULT_TARGET_TRIPLE=${TUPLE} "
-export CTG+="-DLLVM_HOST_TRIPLE=${TUPLE} "
-export CTG+="-DCOMPILER_RT_DEFAULT_TARGET_TRIPLE=${TUPLE} "
-export CTG+="-DLLVM_TARGET_ARCH=host "
-export CTG+="-DLLVM_TARGETS_TO_BUILD=Native;host;AMDGPU;BPF "
-
-# Set the paths ...
-export  CP="-DCMAKE_INSTALL_PREFIX=/usr "
-export CP+="-DCMAKE_INSTALL_LIBDIR=lib "
-
-# Set options for compiler-rt
-# + avoid all the optional runtimes:
-#export  CRT="-DCOMPILER_RT_BUILD_SANITIZERS=OFF "
-#export CRT+="-DCOMPILER_RT_BUILD_XRAY=OFF "
-#export CRT+="-DCOMPILER_RT_BUILD_LIBFUZZER=OFF "
-#export CRT+="-DCOMPILER_RT_BUILD_PROFILE=OFF "
-#export CRT+="-DCOMPILER_RT_BUILD_MEMPROF=OFF "
-# + Avoid need for libexecinfo:
-export  CRT="-DCOMPILER_RT_BUILD_GWP_ASAN=OFF "
-export CRT+="-DCOMPILER_RT_USE_LLVM_UNWINDER=ON "
-export CRT+="-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON "
-# + Set compiler_rt to use libcxx
-export CRT+="-DCOMPILER_RT_CXX_LIBRARY=libcxx "
-
-# Set options for clang
-# + Set the standard C++ library that clang will use to LLVM's libc++
-# + Set compiler-rt as default runtime
-export  CLG="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export CLG+="-DCLANG_DEFAULT_RTLIB=compiler-rt "
-export CLG+="-DCLANG_DEFAULT_UNWINDLIB=libunwind "
-export CLG+="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-
-# Set options for libc++
-export  CLCPP="-DLIBCXX_HAS_MUSL_LIBC=ON "
-export CLCPP+="-DLIBCXX_ENABLE_LOCALIZATION=ON "
-export CLCPP+="-DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON "
-export CLCPP+="-DLIBCXX_CXX_ABI=libcxxabi "
-export CLCPP+="-DLIBCXX_USE_COMPILER_RT=ON "
-export CLCPP+="-DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON "
-export CLCPP+="-DLIBCXX_ENABLE_ASSERTIONS=ON "
-
-# Set options fo libc++abi
-export  CLCPPA="-DLIBCXXABI_USE_LLVM_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON "
-export CLCPPA+="-DLIBCXXABI_USE_COMPILER_RT=ON "
-
-# Set options for libunwind
-export  CUW="-DLIBUNWIND_INSTALL_HEADERS=ON "
-export CUW+="-DLIBUNWIND_USE_COMPILER_RT=ON "
-
-# Set LLVM options
-# + Enable Exception handling and Runtime Type Info
-export  CLLVM="-DLLVM_ENABLE_EH=ON -DLLVM_ENABLE_RTTI=ON "
-export CLLVM+="-DLLVM_ENABLE_ZLIB=ON "
-export CLLVM+="-DZLIB_INCLUDE_DIR=/usr/include "
-export CLLVM+="-DZLIB_LIBRARY_RELEASE=/usr/lib/libz.so "
-export CLLVM+="-DLLVM_INSTALL_UTILS=ON "
-export CLLVM+="-DLLVM_BUILD_LLVM_DYLIB=ON "
-export CLLVM+="-DLLVM_LINK_LLVM_DYLIB=ON "
-export CLLVM+="-DENABLE_LINKER_BUILD_ID=ON "
-export CLLVM+="-DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON "
-export CLLVM+="-DLLVM_ENABLE_LIBCXX=ON "
-export CLLVM+="-DLLVM_ENABLE_LLD=ON "
-export CLLVM+="-DLLVM_ENABLE_ZSTD=ON "
-export CLLVM+="-DLLVM_ENABLE_TERMINFO=ON "
-
-# Turn off LLVM options
-# + Turn off features host may have
-export  COFF="-DLLVM_ENABLE_LIBEDIT=OFF "
-export COFF+="-DLLVM_ENABLE_LIBXML2=OFF "
-export COFF+="-DLLVM_ENABLE_LIBPFM=OFF "
-
-# Remove more tests & docs that breaks build
-export  MOFF="-DCLANG_INCLUDE_TESTS=OFF "
-export MOFF+="-DLLVM_ENABLE_OCAMLDOC=OFF "
-export MOFF+="-DLLVM_INCLUDE_BENCHMARKS=OFF "
-export MOFF+="-DLLVM_INCLUDE_DOCS=OFF "
-export MOFF+="-DLLVM_INCLUDE_EXAMPLES=OFF "
-export MOFF+="-DLLVM_INCLUDE_TESTS=OFF "
-
 # Configure source [to build all of LLVM]
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_ENABLE_PROJECTS="lld;clang" \
-      -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
-      -DCLANG_VENDOR="CMLFS 4.0.0" -DLLD_VENDOR="CMLFS 4.0.0" \
-      -DDEFAULT_SYSROOT="/usr" \
-      $CT $CTG $CP $CRT $CLG $CLCPP $CLCPPA $CUW $CLLVM $COFF $MOFF \
-      -DCMAKE_CXX_FLAGS="-fPIC " \
-      -DCMAKE_C_FLAGS="-fPIC " 
+cmake -B build -S llvm \
+    -G Ninja -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER="clang" \
+    -DCMAKE_CXX_COMPILER="clang++" \
+    -DCMAKE_INSTALL_LIBDIR="lib" \
+    -DCMAKE_INSTALL_PREFIX="/usr" \
+    -DCMAKE_AR="/llvmtools/bin/llvm-ar" \
+    -DCMAKE_NM="/llvmtools/bin/llvm-nm" \
+    -DCMAKE_RANLIB="/llvmtools/bin/llvm-ranlib" \
+    -DCLANG_DEFAULT_LINKER="/usr/bin/ld.lld" \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_INCLUDE_TESTS=OFF \
+    -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+    -DCOMPILER_RT_CXX_LIBRARY=libcxx \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
+    -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
+    -DDEFAULT_SYSROOT="/usr" \
+    -DENABLE_LINKER_BUILD_ID=ON \
+    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_USE_COMPILER_RT=ON \
+    -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+    -DLIBCXX_CXX_ABI=libcxxabi \
+    -DLIBCXX_ENABLE_LOCALIZATION=ON \
+    -DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+    -DLIBCXX_HARDENING_MODE=fast \
+    -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBUNWIND_INSTALL_HEADERS=ON \
+    -DLIBUNWIND_USE_COMPILER_RT=ON \
+    -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_ENABLE_EH=ON \
+    -DLLVM_ENABLE_LIBCXX=ON \
+    -DLLVM_ENABLE_LIBEDIT=OFF \
+    -DLLVM_ENABLE_LIBPFM=OFF \
+    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_LLD=ON \
+    -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_ZSTD=ON \
+    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_TARGETS_TO_BUILD="Native;host;ARM" \
+    -DLLVM_TARGET_ARCH=host \
+    -DZLIB_INCLUDE_DIR="/usr/include" \
+    -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so"
 
 # compile (~ 4,048 targets)
-ninja -C build 
+cmake --build build
+
+# Missing inc file probably cause build failure
+cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/ExtractAPI
 
 # If build fails to compile, use below to see what component failed.
 # ninja -C build $TARGET
@@ -137,21 +105,23 @@ ninja -C build
 
 # Install
 cmake --install build --strip
+cp -v ./clang/include/clang/ExtractAPI/APIRecords.inc /usr/include/clang/ExtractAPI
+rm -rv /usr/bin/python3
 
 # Fix the dynamic linker for the executables:
-for b in bugpoint c-index-test clang-17 count diagtool dsymutil FileCheck \
+for b in bugpoint c-index-test clang-20 count diagtool dsymutil FileCheck \
          llc lld lli lli-child-target not obj2yaml opt sancov sanstats \
          split-file UnicodeNameMappingGenerator verify-uselistorder yaml2obj \
-         yaml-bench  amdgpu-arch nvptx-arch
+         yaml-bench amdgpu-arch nvptx-arch
 do
-  setDL /usr/bin/$b
+  patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done
 
 for b in check extdef-mapping format linker-wrapper \
          offload-bundler offload-packager  \
          rename repl scan-deps scan-deps tblgen 
 do
-  setDL /usr/bin/clang-$b
+  patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/clang-$b
 done
 
 for b in ar as bcanalyzer cat cfi-verify config cov c-test cvtres cxxdump \
@@ -163,25 +133,26 @@ for b in ar as bcanalyzer cat cfi-verify config cov c-test cvtres cxxdump \
          symbolizer tapi-diff tblgen tli-checker undname xray remarkutil \
          debuginfo-analyzer
 do
-  setDL /usr/bin/llvm-$b
+  patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/llvm-$b
 done
 
 # NOTE: stage2 clang loads libc shared object from llvmtools. 
 # Sysroot still set to /llvmtools
 # Create a clang config to set sysroot to /
-cat > /usr/bin/${TUPLE}.cfg << "EOF"
+cat > /usr/bin/x86_64-pc-linux-musl.cfg << "EOF"
 --sysroot=/
 EOF
 
 # NOTE: Stage2 clang looks for ld/lld first /llvmtools/bin
 # Disable it:
 mv -v  /llvmtools/bin/lld{,.disabled}
+ln -sfv ld.lld /usr/bin/ld
 
 # Test stage2 Clang
 echo "int main(){}" > dummy.c
 /usr/bin/clang dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
-# Shoud output:
+# Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
 
 # Check if the correct start files are used
@@ -199,22 +170,22 @@ grep -B1 -A1 '^ /usr' dummy.log
 # #include <...> search starts here:
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/17/include
+#  /usr/lib/clang/20/include
 # End of search list.
 
 # Make sure no libraries are loaded from llvmtools
 grep ld:  dummy.log
 # ld.lld: /lib/Scrt1.o
 # ld.lld: /lib/crti.o
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
+# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
 # ld.lld: /tmp/dummy-1f0e32.o
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
 # ld.lld: /lib/libatomic.so
 # ld.lld: /lib/libc.so
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
+# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
 # ld.lld: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
@@ -244,7 +215,7 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/17/include
+#  /usr/lib/clang/20/include
 # It should be in this order
 
 # Test if stage1 clang supports C++11
@@ -280,7 +251,7 @@ llvm-readelf -d /usr/lib/libc++.so.1.0  | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 llvm-readelf -d /usr/lib/libc++abi.so.1.0  | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /usr/lib/libLLVM-17.0.5.so | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libLLVM-20.so | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libzstd.so.1]
 # Shared library: [libterminfo.so]
@@ -294,12 +265,9 @@ unset CT CTG CP CRT CLG CLCPP CLCPPA CUW CLLVM COFF CFLAGS CXXFLAGS
 # Set the default compiler for chroot to stage2 clang:
 export CC=clang CXX=clang++
 
-# Set LLD as default linker
-ln -sv ld.lld /usr/bin/ld
-
 # Many packages use the name cc to call the C compiler. To
 # satisfy those packages, create a symlink
-ln -sv clang-17 /usr/bin/cc
+ln -sv clang-20 /usr/bin/cc
 
 # Create a symlink required by the FHS for "historical" reasons
-ln -sv ../bin/clang-17 /usr/lib/cpp
+ln -sv ../bin/clang-20 /usr/lib/cpp

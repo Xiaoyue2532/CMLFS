@@ -13,13 +13,13 @@ sed -i '/int Guess/a \
 ' src/ninja.cc
 
 # Configure source with cmake:
-cmake -B OUT \
+cmake -B out \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/llvmtools \
     -DBUILD_TESTING=OFF
 
 # Compile
-make -C OUT 
+make -C out -j`nproc --all`
 
 # Install
-make -C OUT install
+make -C out install

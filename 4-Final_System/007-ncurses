@@ -1,0 +1,43 @@
+# Final System: netbsd-curses
+# Build and install under chroot
+
+# set symbol link
+ln -s llvm-strip /llvmtools/bin/strip
+
+# Build
+CC=clang  \
+CXX=clang++ \
+AR=llvm-ar \
+RANLIB=llvm-ranlib \
+./configure \
+    --prefix=/usr           \
+    --mandir=/usr/share/man \
+    --with-shared           \
+    --without-debug         \
+    --without-normal        \
+    --with-cxx-shared       \
+    --enable-pc-files       \
+    --with-pkg-config-libdir=/usr/lib/pkgconfig
+
+make -j`nproc --all` && make install
+
+make DESTDIR=$PWD/dest install
+install -vm755 dest/usr/lib/libncursesw.so.6.5 /usr/lib
+rm -v  dest/usr/lib/libncursesw.so.6.5
+sed -e 's/^#if.*XOPEN.*$/#if 1/' \
+    -i dest/usr/include/curses.h
+cp -av dest/* /
+
+ln -sfv libncursesw.so /usr/lib/libcurses.so
+
+# Install
+
+# Some packages may not configure with the curses library.
+# Create a compatibility link:
+ln -sv  libcurses.so  /usr/lib/libtinfo.so
+
+# Set the dynamic loader for each executable
+for b in infocmp tabs tic tput tset
+do
+  setDL /usr/bin/$b
+done

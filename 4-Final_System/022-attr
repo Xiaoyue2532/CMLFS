@@ -10,5 +10,5 @@ AR=llvm-ar NM=llvm-nm \
             --sysconfdir=/etc \
             --docdir=/usr/share/doc/attr-2.5.1
 
-make && make install
+make -j`nproc --all` && make install
 

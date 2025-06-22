@@ -8,13 +8,17 @@
     --target=x86_64-pc-linux-musl
 
 # Buid and install
-make -j16 && make DESTDIR=/llvmtools install
+make -j`nproc --all` && make DESTDIR=/llvmtools install
 
 # Fix a symlink
 rm -v /llvmtools/lib/ld-musl-x86_64.so.1
 ln -sv libc.so /llvmtools/lib/ld-musl-x86_64.so.1
 
-# fix broken llvm libcxx
+# Stage1 clang expects headers in /llvmtools/usr/include
+# May need a patch clang source to change that...
+# o clang/lib/Driver/ToolChains/Linux.cpp
+# o clang/lib/Driver/ToolChains/Gnu.cpp
+# For now, create a link.
 ln -sv . /llvmtools/usr
 
 # Create a symlink that can be used to print

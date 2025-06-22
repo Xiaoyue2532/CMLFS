@@ -13,4 +13,4 @@ STRIP=llvm-strip \
             --prefix=/llvmtools
 
 # Build and install to toolchain
-make -j16 && make install
+make -j`nproc --all` && make install

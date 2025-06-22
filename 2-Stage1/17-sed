@@ -1,12 +1,14 @@
 # Stage1: Sed 
 # Build by cmlfs
 
-CC=clang CXX=clang++ \
+CC=clang \
+CXX=clang++ \
 AR=llvm-ar \
 AS=llvm-as \
-RANLIB=llvm-ranlib \
 LD=ld.lld \
+RANLIB=llvm-ranlib \
 STRIP=llvm-strip \
-./configure --prefix=/llvmtools
+./configure \
+    --prefix=/llvmtools
 
-make && make install
+make -j`nproc --all` && make install

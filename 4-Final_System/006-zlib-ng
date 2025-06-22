@@ -2,21 +2,22 @@
 # This section is done in Chroot environment
 
 # Configure buld with CMake
-cmake -B BUILD \
-      -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_LIBDIR=lib \
-      -DZLIB_COMPAT=ON \
-      -UBUILD_SHARED_LIBS \
-      -DWITH_GTEST=OFF \
-      -DPKGCONFIG_INSTALL_DIR="/usr/lib/pkgconfig" \
-      -G Ninja
+cmake \
+    -B build \
+    -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DZLIB_COMPAT=ON \
+    -UBUILD_SHARED_LIBS \
+    -DWITH_GTEST=OFF \
+    -DPKGCONFIG_INSTALL_DIR="/usr/lib/pkgconfig"
 
 # Compile
-ninja -C BUILD
+cmake --build build
 
 # Install
-cmake --install BUILD --strip
+cmake --install build --strip
 
 # Create compatibility link
 ln -sv libz.so.1.3.0.zlib-ng /usr/lib/libz.so.1.3.0

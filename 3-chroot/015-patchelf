@@ -21,7 +21,7 @@ AS=llvm-as \
 ./configure --prefix=/llvmtools
 
 # Build and install to llvmtools
-make && make install
+make -j`nproc --all` && make install
 
 # Create a script to easily set the dynamic loader/linker/interpreter
 # for a binary:

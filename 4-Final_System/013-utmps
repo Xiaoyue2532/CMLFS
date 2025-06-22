@@ -23,8 +23,7 @@ CC=clang CXX=clang++ \
             --with-dynlib=/usr/lib \
             --build=${TUPLE}
 # Build and Install
-make
-make install
+make -j`nproc --all` && make install
 
 # Some packages look for utmpx.h in /usr/include
 ln -sv utmps/utmpx.h /usr/include/utmpx.h

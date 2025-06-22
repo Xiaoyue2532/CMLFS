@@ -3,11 +3,10 @@
 # This section is done in Chroot environment
 
 # Clean source tree
-LLVM=1 LLVM_IAS=1 make CC=clang mrproper
+make LLVM=1 mrproper
 
 # Extract Headers:
-LLVM=1 LLVM_IAS=1 \
-make CC=clang HOSTCC=clang headers
+make LLVM=1 headers
 
 # Install the header to toolchain
 cp -rv usr/include/* /llvmtools/include
@@ -19,4 +18,3 @@ find /llvmtools/include \( -name '.*' -o -name '.*.cmd' \) -exec rm -vf {} \;
 
 # Remove unneeded makefile
 rm -v /llvmtools/include/Makefile
-

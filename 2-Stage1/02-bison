@@ -10,12 +10,10 @@ AS=llvm-as \
 RANLIB=llvm-ranlib \
 LD=ld.lld \
 STRIP=llvm-strip \
-./configure --prefix=/llvmtools \
-            --build=x86_64-pc-linux-musl \
-            --host=x86_64-pc-linux-musl
+./configure \
+    --prefix=/llvmtools \
+    --build=x86_64-pc-linux-musl \
+    --host=x86_64-pc-linux-musl
 
-# Compile
-make -j16
-
-# Install to llvmtools
-make install
+# Compile and install to llvmtools
+make -j`nproc --all` && make install

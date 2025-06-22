@@ -23,7 +23,7 @@ CC=clang CXX=clang++            \
             --with-openssl-rpath=/opt/openssl/lib
 
 # Build and install
-make && make install
+make -j`nproc --all` && make install
 
 # Change permissions to allow stripping later
 chmod -v 755 /usr/lib/libpython3.12.so

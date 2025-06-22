@@ -11,4 +11,4 @@ patch -Np1 -i ../patches/m4-alpine/test-posix_spawn_file_actions_addclose.patch
 ./configure --prefix=/usr
 
 # Build and install
-make && make install
+make -j`nproc --all` && make install

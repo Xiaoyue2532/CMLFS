@@ -2,11 +2,11 @@
 # This section is done in Chroot environment
 
 # Apply patches form Alpine Linux
-patch -Np1 -i ../patches/bzip2-alpine/bzip2-1.0.2-progress.patch
-patch -Np1 -i ../patches/bzip2-alpine/bzip2-1.0.3-no-test.patch
-patch -Np1 -i ../patches/bzip2-alpine/bzip2-1.0.4-makefile-CFLAGS.patch
-patch -Np1 -i ../patches/bzip2-alpine/bzip2-1.0.4-man-links.patch
-patch -Np1 -i ../patches/bzip2-alpine/saneso.patch
+patch -Np1 -i ../../CMLFS/patches/bzip2-alpine/bzip2-1.0.2-progress.patch
+patch -Np1 -i ../../CMLFS/patches/bzip2-alpine/bzip2-1.0.3-no-test.patch
+patch -Np1 -i ../../CMLFS/patches/bzip2-alpine/bzip2-1.0.4-makefile-CFLAGS.patch
+patch -Np1 -i ../../CMLFS/patches/bzip2-alpine/bzip2-1.0.4-man-links.patch
+patch -Np1 -i ../../CMLFS/patches/bzip2-alpine/saneso.patch
 
 # Fix man path
 # Generate relative symlinks
@@ -47,7 +47,7 @@ unset CFLAGS
 # Set the dynamic loader for each executable
 for b in bzip2 bzip2recover bzcat bunzip2
 do
-  setDL /usr/bin/$b
+  patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done
 
 # Remove temporary link

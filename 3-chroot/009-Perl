@@ -28,7 +28,7 @@ sh Configure -des -Dprefix=/llvmtools \
     -Dcccdlflags='-fPIC' -Dccdlflags='-rdynamic'
 
 # compile
-make
+make -j`nproc --all`
 
 # Only a few of the utilities and libraries need to be installed to toolchain
 cp -v perl cpan/podlators/scripts/pod2man /llvmtools/bin
@@ -36,5 +36,3 @@ mkdir -pv    /llvmtools/lib/perl5/5.40.2
 cp -Rv lib/* /llvmtools/lib/perl5/5.40.2
 
 unset BUILD_ZLIB BUILD_BZIP2 CFLAGS
-
-

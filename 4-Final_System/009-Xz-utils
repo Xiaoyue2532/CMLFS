@@ -2,14 +2,15 @@
 # This section is done in Chroot environment
 
 CC=$CC CXX=$CXX \
-./configure --prefix=/usr    \
-            --disable-static \
-            --docdir=/usr/share/doc/xz-5.4.5
+./configure \
+   --prefix=/usr    \
+   --disable-static \
+   --docdir=/usr/share/doc/xz-5.8.1
 
-make && make install
+make -j`nproc --all` && make install
 
 # Set the dynamic loader for each executable
 for b in lzmadec lzmainfo xz xzdec
 do
-   setDL /usr/bin/$b
+   patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done

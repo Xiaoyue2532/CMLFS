@@ -31,7 +31,7 @@ RANLIB=llvm-ranlib \
     AWK=gawk
 
 # Install to llvmtools
-make -j16 && make TIC_PATH=$(pwd)/build/progs/tic install
+make -j`nproc --all` && make TIC_PATH=$(pwd)/build/progs/tic install
 
 ln -sv libncursesw.so /llvmtools/lib/libncurses.so
 sed -e 's/^#if.*XOPEN.*$/#if 1/' \

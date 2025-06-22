@@ -15,6 +15,9 @@ find ../cports/main/llvm/patches/ -type f -exec patch -Np1 -i {} \;
 # Force 'abi' changes (glibc->musl) to source and disable xlocale.h (holds abi changes).
 #patch -Np1 -i ../patches/llvm1506-cmlfs/remove-locale-inlines.patch
 
+# gcc dont have nostdinc
+patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdinc-with-the-C-.patch
+
 # Since, libunwind is for cgnutools, modify the cross-gcc specs to set the dynamic
 # loader as  /cgnutools/lib/ld-musl-${MCA}.so.1
 export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -d' ' -f3- )
@@ -23,7 +26,7 @@ export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -
 export CFLAGS="-fPIC "
 export CXXFLAGS=$CFLAGS
 
-cmake ../libunwind \
+cmake -S libunwind -B build \
     -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/cgnutools" \
@@ -41,10 +44,10 @@ cmake ../libunwind \
     -DLIBUNWIND_HIDE_SYMBOLS=ON
 
 # compile
-ninja
+cmake --build build
 
 # install to cgnutools
-ninja install-unwind-stripped
+cmake --install build --strip
 
 # Built libunwind.so will have unresolved symbols:
 # $ ldd /cgnutools/lib/libunwind.so.1.0

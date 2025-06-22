@@ -50,7 +50,7 @@ AR=llvm-ar \
             --without-libbsd
 
 # Build, Install, and fix misplaced files
-make && make install
+make -j`nproc --all` && make install
 
 # Enable shadowed passwords and shadowed group passwords:
 pwconv
