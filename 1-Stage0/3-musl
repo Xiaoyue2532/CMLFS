@@ -46,7 +46,7 @@ export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -
 cd $CMLFS/sources
 printf "#include <stdio.h>\nint main(){}\n" > dummy.c
 x86_64-pc-linux-musl-gcc dummy.c
-readelf -l a.out | grep ld
+llvm-readelf -l a.out | grep ld
 
 # Should output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1]

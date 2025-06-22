@@ -26,7 +26,7 @@ STRIP=llvm-strip \
 # Build and install to toolchain
 make -j16 && make install
 
-chmod -v 755 /llvmtools/lib/libpython3.14.so &&
+chmod -v 755 /llvmtools/lib/libpython3.13.so &&
 chmod -v 755 /llvmtools/lib/libpython3.so 
 
 unset PI 

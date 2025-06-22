@@ -12,7 +12,7 @@ STRIP=llvm-strip \
 ./bootstrap \
     --prefix=/llvmtools \
     --mandir=/share/man \
-    --docdir=/share/doc/cmake-3.28.6 \
+    --docdir=/share/doc/cmake-4.0.3 \
     --no-system-jsoncpp \
     --no-system-librhash \
     --no-system-curl \

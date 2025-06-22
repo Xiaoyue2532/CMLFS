@@ -2,16 +2,17 @@
 # Build as cmlfs user
 
 # If host uses clang instead of GCC, prefix each make 
-# command with LLVM=1 LLVM_IAS=1
-
-# Clean the source
-make mrproper
+# command with LLVM=1
 
 # Build the headers
-ARCH=x86_64 make headers
+make mrproper
+make ARCH=x86_64 LLVM=1 headers
 
 # Install the headers for stage 0 clang
 find usr/include \( -name .install -o -name ..install.cmd \) -exec rm -vf {} \;
-mkdir -pv /llvmtools/include
+sudo mkdir -pv /llvmtools/include && sudo chown -R arch:arch /llvmtools
 cp -rv usr/include/* /llvmtools/include/
 rm -v /llvmtools/include/Makefile
+
+# Clean the source
+make mrproper
