@@ -1,0 +1,13 @@
+# Final System: Check 
+# This section is done in Chroot environment
+
+CC=clang \
+CXX=clang++ \
+./configure \
+    --prefix=/usr \
+    --disable-static
+
+make -j`nproc --all` && make install
+
+# Fix a script
+sed -i '1 s/llvmtools/usr/' /usr/bin/checkmk

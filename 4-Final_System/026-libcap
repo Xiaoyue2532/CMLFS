@@ -1,0 +1,14 @@
+# Final System: Libcap
+# This section is done in Chroot environment
+
+# Apply patches from Chimera Linux:
+find /root/cports/main/libcap/patches/ -type f -exec patch -Np1 -i {} \;
+
+# Prevent static libraries from being installed:
+sed -i '/install -m.*STA/d' libcap/Makefile
+
+# Compile with clang
+make prefix=/llvmtools lib=lib CC=clang -j`nproc --all`
+
+# Install
+make prefix=/llvmtools lib=lib install

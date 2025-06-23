@@ -1,0 +1,21 @@
+# Final System: Inetutils 
+# This section is done in Chroot environment
+
+# Apply patch for utmpx support
+patch -Np1 -i ../../CMLFS/patches/inetutils-mlfs/logwtmp.patch &&
+
+# Configure source with clang
+./configure \
+    --prefix=/usr \
+    --localstatedir=/var \
+    --disable-logger \
+    --disable-whois \
+    --disable-rcp \
+    --disable-rexec \
+    --disable-rlogin \
+    --disable-rsh \
+    --disable-servers \
+    ac_cv_header_sys_cdefs_h=no
+
+# Compile & install
+make -j`nproc --all` && make install

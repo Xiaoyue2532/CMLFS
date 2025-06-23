@@ -1,0 +1,9 @@
+# Final System: Libtool 
+# This section is done in Chroot environment
+
+# Configure with clang
+./configure \
+    --prefix=/usr 
+
+# Compile & install
+make -j`nproc --all` && make install

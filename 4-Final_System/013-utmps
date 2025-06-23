@@ -2,26 +2,22 @@
 # This section is done in Chroot environment
 
 # Set version for pkgconfig file
-cp -v ../files/utmps-alpine/*.pc /tmp/
-sed -i -e "s/@@VERSION@@/0.1.2.2/g" -- /tmp/*.pc 
+cp -v ../../CMLFS/files/utmps-alpine/*.pc /tmp/
+sed -i -e "s/@@VERSION@@/0.1.3.1/g" -- /tmp/*.pc 
 
-# Source is hard-coded for binutils.
-# Create links to work around
-for l in ar ranlib strip
-do
-  ln -sv llvm-$l /usr/bin/$l
-done
+CC=clang \
+CXX=clang++ \
+./configure \
+    --build="x86_64-pc-linux-musl" \
+    --enable-shared \
+    --enable-static \
+    --disable-allstatic \
+    --enable-static-libc \
+    --libdir=/usr/lib \
+    --with-dynlib=/usr/lib \
+    --libexecdir=/usr/lib/utmps \
+    --with-dynlib=/usr/lib
 
-CC=clang CXX=clang++ \
-./configure --enable-shared      \
-            --enable-static      \
-            --disable-allstatic  \
-            --enable-static-libc \
-            --libdir=/usr/lib    \
-            --with-dynlib=/usr/lib   \
-            --libexecdir="/usr/lib/utmps" \
-            --with-dynlib=/usr/lib \
-            --build=${TUPLE}
 # Build and Install
 make -j`nproc --all` && make install
 
@@ -30,9 +26,3 @@ ln -sv utmps/utmpx.h /usr/include/utmpx.h
 
 # Install pkgconfig file
 install -v -D -m644 /tmp/utmps.pc /usr/lib/pkgconfig
-
-# Remove links
-for l in ar ranlib strip
-do
-  rm -v /usr/bin/$l
-done

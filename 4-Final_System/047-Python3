@@ -1,0 +1,34 @@
+# Final System: Python3
+# This section is done in Chroot environment
+
+# Apply patch to build under musl, from Void Linux
+find ../../cports/main/python/patches/ -type f -exec patch -Np1 -i {} \;
+
+# Remove to ensure system expat is used.
+rm -r Modules/expat
+
+# Configure source
+CC=clang \
+CXX=clang++ \
+./configure \
+    --prefix=/usr \
+    --enable-shared \
+    --with-system-expat \
+    --with-ensurepip=yes \
+    --disable-gil \
+    --enable-loadable-sqlite-extensions \
+    --enable-optimizations \
+    --with-computed-gotos \
+    --enable-ipv6
+
+# Build and install
+make -j`nproc --all` && make install
+
+# Change permissions to allow stripping later
+chmod -v 755 /usr/lib/libpython3.13t.so
+chmod -v 755 /usr/lib/libpython3.so
+
+# Pip3 expects to find /usr/bin/python. Python2 is no longer
+# used nor built.
+# Create the missing link
+ln -sv python3 /usr/bin/python

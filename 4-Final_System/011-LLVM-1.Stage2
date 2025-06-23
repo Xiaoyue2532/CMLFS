@@ -271,3 +271,7 @@ ln -sv clang-20 /usr/bin/cc
 
 # Create a symlink required by the FHS for "historical" reasons
 ln -sv ../bin/clang-20 /usr/lib/cpp
+
+# fix posixtz need c99
+cp ../../cports/main/llvm/files/c99 /usr/bin/c99
+chmod +x /usr/bin/c99

@@ -1,0 +1,16 @@
+# Final System: PkgConf
+# This section is done in Chroot environment
+
+# Configure source
+./configure \
+    --prefix=/usr \
+    --docdir=/usr/share/doc/pkgconf-2.4.3 \
+    --sysconfdir=/etc \
+    --localstatedir=/var \
+    --with-pkg-config-dir=/usr/lib/pkgconfig:/usr/share/pkgconfig:/opt/qt5/lib/pkgconfig
+
+# Build and Install
+make -j`nproc --all` && make install
+
+# Compatibility for pkgconfig
+ln -s pkgconf /usr/bin/pkg-config

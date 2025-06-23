@@ -1,0 +1,12 @@
+# Final System: Less
+# This section is done in Chroot environment
+
+# Configure wih clang
+CC=clang \
+CXX=clang++ \
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc
+
+# Compile & install
+make -j`nproc --all` && make install

@@ -1,14 +1,15 @@
 # Final System: Attr 
 # This section is done in Chroot environment
 
-CC=clang CXX=clang++          \
-AR=llvm-ar NM=llvm-nm \
-./configure --prefix=/usr     \
-            --bindir=/usr/bin \
-            --libdir=/usr/lib \
-            --disable-static  \
-            --sysconfdir=/etc \
-            --docdir=/usr/share/doc/attr-2.5.1
+find /root/cports/main/attr/patches/ -type f -exec patch -Np1 -i {} \;
+
+./configure \
+    --prefix=/usr     \
+    --bindir=/usr/bin \
+    --libdir=/usr/lib \
+    --disable-static  \
+    --sysconfdir=/etc \
+    --docdir=/usr/share/doc/attr-2.5.2
 
 make -j`nproc --all` && make install
 

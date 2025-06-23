@@ -1,26 +1,15 @@
 # Final System: Skalibs
 # This section is done in Chroot environment
 
-# Source is hard-coded for binutils.
-# Create links to work around
-for l in ar ranlib strip
-do
- ln -sv llvm-$l /usr/bin/$l
-done 
-
 # Configure source
-CC=clang CXX=clang \
-./configure --prefix=/usr       \
-            --build=${TUPLE}   \
-            --enable-static     \
-            --enable-shared     \
-            --libdir=/usr/lib
+CC=clang \
+CXX=clang \
+./configure \
+    --prefix=/usr \
+    --build="x86_64-pc-linux-musl" \
+    --enable-static \
+    --enable-shared \
+    --libdir=/usr/lib
 
 # Build and Install
 make -j`nproc --all` && make install
-
-# Remove links
-for l in ar ranlib strip
-do
-  rm -v /usr/bin/$l
-done

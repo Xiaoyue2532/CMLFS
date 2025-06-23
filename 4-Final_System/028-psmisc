@@ -1,0 +1,18 @@
+# Final System: Psmisc
+# This section is done in Chroot environment
+
+# Configure source with clang
+./configure -\
+    -prefix=/usr        \
+    --sysconfdir=/etc     \
+    --localstatedir=/var  \
+    --bindir=/usr/bin     \
+    --sbindir=/usr/sbin   \
+    --libdir=/usr/lib     \
+    --disable-selinux     \
+    --enable-harden-flags \
+    --enable-ipv6
+
+# Compile & install
+make -j`nproc --all` && make install
+
