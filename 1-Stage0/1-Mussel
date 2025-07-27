@@ -28,7 +28,10 @@ patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch
 
 # Build toolchain. Amend PATH to include /cgnutools/bin
 # o Omit -p if not building in parallel to use all the host's CPU cores
-sudo PATH=/cgnutools/bin:$PATH CC=clang CXX=clang++ ./mussel x86_64 -l -o -k -p -g
+
+# may use gcc-15.1.1
+# refer to https://gitlab.archlinux.org/archlinux/packaging/packages/gcc/
+sudo PATH=/cgnutools/bin:$PATH ./mussel x86_64 -l -o -k -p -g
 
 # Make sure cgnutools is owned by cmlfs
 sudo chown -vR cmlfs $CMLFS/cgnutools
@@ -43,14 +46,15 @@ rm -rfv /cgnutools/share/{man,info}
 # cgnutools.
 # This will be reached by creating a modified specs file in the
 # proper location:
-export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc  --version | sed 1q | cut -d' ' -f3- )
+# export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -d' ' -f3- )
+export MCGV=15.1.1
 /cgnutools/bin/x86_64-pc-linux-musl-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/llvmtools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/x86_64-pc-linux-musl/$MCGV/specs
 
 # Test the _tools toolchain:
 cd $CMLFS/sources
 printf "#include <stdio.h>\nint main(){}\n" > dummy.c
 /cgnutools/bin/x86_64-pc-linux-musl-gcc dummy.c
-llvm-readelf -l a.out | grep ld
+readelf -l a.out | grep ld
 
 # Should output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1]

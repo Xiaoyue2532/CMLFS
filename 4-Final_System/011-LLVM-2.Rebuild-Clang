@@ -13,7 +13,7 @@ export  COPTS="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
 export COPTS+="-DCLANG_DEFAULT_RTLIB=compiler-rt "
 export COPTS+="-DCLANG_DEFAULT_UNWINDLIB=libunwind "
 export COPTS+="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export COPTS+="-DCLANG_DEFAULT_LINKER=/usr/bin/ld.lld "
+export COPTS+="-DCLANG_DEFAULT_LINKER=lld "
 export COPTS+="-DCLANG_INCLUDE_TESTS=OFF "
 
 # Turn off LLVM options:
@@ -35,14 +35,15 @@ export LOPTS+="-DLLVM_DEFAULT_TARGET_TRIPLE=${TUPLE} "
 export LOPTS+="-DLLVM_TARGETS_TO_BUILD=Native;host;AMDGPU;BPF "
 
 # Configure source to enable only the clang project:
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DLLVM_ENABLE_PROJECTS=clang \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCMAKE_INSTALL_LIBDIR=lib  \
-      -DCLANG_VENDOR="CMLFS 4.0.0" \
-      -DDEFAULT_SYSROOT=/ \
-      $COPTS $LOFF $LOPTS
+cmake -S llvm -B build \
+    -G Ninja -Wno-dev \
+    -DLLVM_ENABLE_PROJECTS=clang \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib  \
+    -DCLANG_VENDOR="CMLFS 4.0.0" \
+    -DDEFAULT_SYSROOT=/ \
+    $COPTS $LOFF $LOPTS
 
 ninja -C build
 

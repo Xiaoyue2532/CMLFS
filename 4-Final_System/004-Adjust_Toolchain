@@ -42,7 +42,7 @@ EOF
 # this, perform the following sanity checks:
 echo 'int main(){}' > dummy.c
 $CC dummy.c -v -Wl,--verbose &> dummy.log
-setDL a.out
+patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 a.out
 llvm-readelf -l a.out | grep ': /lib'
 # Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1]
