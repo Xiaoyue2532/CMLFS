@@ -20,7 +20,8 @@ patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdi
 
 # Since, libunwind is for cgnutools, modify the cross-gcc specs to set the dynamic
 # loader as  /cgnutools/lib/ld-musl-${MCA}.so.1
-export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -d' ' -f3- )
+# export MCGV=$(/cgnutools/bin/x86_64-pc-linux-musl-gcc --version | sed 1q | cut -d' ' -f3- )
+export MCGV=15.1.1
 /cgnutools/bin/x86_64-pc-linux-musl-gcc -dumpspecs | sed 's/\/lib\/ld-musl/\/cgnutools\/lib\/ld-musl/g' > /cgnutools/lib/gcc/x86_64-pc-linux-musl/$MCGV/specs
 
 export CFLAGS="-fPIC "

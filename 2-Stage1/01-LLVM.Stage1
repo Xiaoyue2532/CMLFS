@@ -4,17 +4,15 @@
 # o Reuse llvm-project source tree from before
 #
 
-# Restore -nostdlibc changes
-# clang we use in the following stages support stdinc
-# revert patch
-patch -Np1 -R -i ../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdinc-with-the-C-.patch
+# - libunwind/include/unwind.h: "__libunwind_config.h" -> <__libunwind_config.h>
+# - libunwind/include/unwind.h: "unwind_itanium.h" -> <unwind_itanium.h>
 
-sudo pacman -Rscun clang llvm lld
-
-export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
+# export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
+export CFLAGS="-fPIC"
 export CXXFLAGS=$CFLAGS
 
-cmake -B build -S llvm \
+cmake \
+    -B build -S llvm \
     -G "Ninja" -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/llvmtools" \
@@ -23,10 +21,12 @@ cmake -B build -S llvm \
     -DCMAKE_AR="/cgnutools/bin/llvm-ar" \
     -DCMAKE_NM="/cgnutools/bin/llvm-nm" \
     -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
+    -DCLANG_BUILD_EXAMPLES=OFF \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
-    -DCLANG_DEFAULT_LINKER="/llvmtools/bin/ld.lld" \
+    -DCLANG_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
     -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
     -DCOMPILER_RT_BUILD_MEMPROF=OFF \
@@ -35,44 +35,58 @@ cmake -B build -S llvm \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DCOMPILER_RT_CXX_LIBRARY=libcxx \
     -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
     -DDEFAULT_SYSROOT="/llvmtools" \
     -DENABLE_LINKER_BUILD_ID=ON \
     -DLIBCXXABI_ENABLE_STATIC_UNWINDER=OFF \
+    -DLIBCXXABI_INCLUDE_TESTS=OFF \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=OFF \
     -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLIBCXX_INCLUDE_BENCHMARKS=OFF \
+    -DLIBCXX_INCLUDE_DOCS=OFF \
+    -DLIBCXX_INCLUDE_TESTS=OFF \
     -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBUNWIND_INCLUDE_DOCS=OFF \
+    -DLIBUNWIND_INCLUDE_TESTS=OFF \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
+    -DLLVM_BUILD_BENCHMARKS=OFF \
+    -DLLVM_BUILD_DOCS=OFF \
+    -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_BUILD_UTILS=OFF \
     -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
     -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=OFF \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
-    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
+    -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
+    -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH="host" \
-    -DLLVM_CCACHE_BUILD=ON \
     -DZLIB_INCLUDE_DIR="/llvmtools/include" \
     -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so"
-
-// -DLLVM_ENABLE_LLD=ON \
 
 # compile
 cmake --build build
@@ -91,47 +105,45 @@ ninja -C build clang # ..................................... PASS
 ninja -C build libclang # .... 31 .......................... PASS
 ninja -C build # ............ 508 .......................... PASS
 
-# LLVM-20.1.6 support is still weird
-export LD_LIBRARY_PATH=/home/arch/sources/llvm-project-20.1.6.src/build/lib
+# # LLVM-20.1.6 support is still weird
+# export LD_LIBRARY_PATH=/home/arch/sources/llvm-project-20.1.6.src/build/lib
 
-rm /cgnutools/bin/{ld,llvm-strip}
-ln -s build/bin/ld.lld /cgnutools/bin/ld
-ln -s build/bin/llvm-strip /cgnutools/bin/llvm-strip
+# rm /cgnutools/bin/{ld,llvm-strip}
+# ln -s build/bin/ld.lld /cgnutools/bin/ld
+# ln -s build/bin/llvm-strip /cgnutools/bin/llvm-strip
 
-# Fix broken libunwind
-ln -s /cgnutools/lib/libunwind.so.1.0 /llvmtools/lib/libunwind.so.1.0
-ln -s libunwind.so.1.0 /llvmtools/lib/libunwind.so.1
-ln -s libunwind.so.1 /llvmtools/lib/libunwind.so
+# # Fix broken libunwind
+# ln -s /cgnutools/lib/libunwind.so.1.0 /llvmtools/lib/libunwind.so.1.0
+# ln -s libunwind.so.1.0 /llvmtools/lib/libunwind.so.1
+# ln -s libunwind.so.1 /llvmtools/lib/libunwind.so
 
-# Fix broken libc++
-ln -s /cgnutools/lib/libc++.so.1.0 /llvmtools/lib/libc++.so.1.0
-ln -s libc++.so.1.0 /llvmtools/lib/libc++.so.1
-ln -s libc++.so.1 /llvmtools/lib/libc++.so
+# # Fix broken libc++
+# ln -s /cgnutools/lib/libc++.so.1.0 /llvmtools/lib/libc++.so.1.0
+# ln -s libc++.so.1.0 /llvmtools/lib/libc++.so.1
+# ln -s libc++.so.1 /llvmtools/lib/libc++.so
 
-# Fix broken libc++abi
-ln -s /cgnutools/lib/libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1.0
-ln -s libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1
-ln -s libc++abi.so.1 /llvmtools/lib/libc++abi.so
+# # Fix broken libc++abi
+# ln -s /cgnutools/lib/libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1.0
+# ln -s libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1
+# ln -s libc++abi.so.1 /llvmtools/lib/libc++abi.so
 
 # install to llvmtools
 cmake --install build --strip
 
 # Make LLD the default linker
-ln -sv lld /llvmtools/bin/ld
+ln -sv clang-19 /llvmtools/bin/x86_64-pc-linux-musl-clang
+ln -sv clang-19 /llvmtools/bin/x86_64-pc-linux-musl-clang++
 
-# Many packages use the name cc to call the C compiler. To
-# satisfy those packages, create a symlink
-ln -sv clang-20 /llvmtools/bin/cc
-
-# Clear variables used in the CMake invocation:
-unset CFLAGS CXXFLAGS
+# # Clear variables used in the CMake invocation:
+# unset CFLAGS CXXFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
-export PATH=/llvmtools/bin:$PATH
+export PATH=/llvmtools/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 
 # Test stage1 Clang
-echo "int main(){}" > dummy.c
-/llvmtools/bin/clang dummy.c -v -Wl,--verbose &> dummy.log
+echo "int main() {}" > dummy.c
+/llvmtools/bin/x86_64-pc-linux-musl-clang \
+    dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
@@ -148,22 +160,22 @@ grep -B1 -A2 '^ /llvmtools' dummy.log
 # It should output:
 # #include <...> search starts here:
 #  /llvmtools/usr/include
-#  /llvmtools/lib/clang/20/include
+#  /llvmtools/lib/clang/19/include
 # End of search list.
 
 # Make sure no libraries are loaded from the host or cgnutools
 grep ld.lld:  dummy.log
 # ld.lld: /llvmtools/lib/Scrt1.o
 # ld.lld: /llvmtools/lib/crti.o
-# ld.lld: /llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
+# ld.lld: /llvmtools/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
 # ld.lld: /tmp/dummy-35ed76.o
-# ld.lld: /llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /llvmtools/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /llvmtools/lib/libunwind.so
 # ld.lld: /llvmtools/lib/libatomic.so
 # ld.lld: /llvmtools/lib/libc.so
-# ld.lld: /llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /llvmtools/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /llvmtools/lib/libunwind.so
-# ld.lld: /llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
+# ld.lld: /llvmtools/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
 # ld.lld: /llvmtools/lib/crtn.o
 
 # Check if stage1 clang++ [in llvmtools] has atomics.
@@ -173,14 +185,14 @@ std::atomic<int> x;
 std::atomic<short> y;
 std::atomic<char> z;
 int main() {
-  ++z;
-  ++y;
-  return ++x;
+    ++z;
+    ++y;
+    return ++x;
 }
 EOF
 
-/llvmtools/bin/clang++ \
-atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
+/llvmtools/bin/x86_64-pc-linux-musl-clang++ \
+    atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
 
 # Check for errors during compile or link:
 grep error:  atomics-test.log
@@ -192,7 +204,7 @@ grep -B2 -A2 '^ /llvmtools' atomics-test.log
 # #include <...> search starts here:
 #  /llvmtools/bin/../include/c++/v1
 #  /llvmtools/usr/include
-#  /llvmtools/lib/clang/20/include
+#  /llvmtools/lib/clang/19/include
 # End of search list.
 # NOTE: /llvmtools/include/c++/v1 should be searched first.
 
@@ -200,20 +212,21 @@ grep -B2 -A2 '^ /llvmtools' atomics-test.log
 cat > cxx11-test.cpp << "EOF"
 #include <iostream>
 
-int main(){
-   #if __cplusplus==201402L
-   std::cout << "C++14" << std::endl;
-   #elif __cplusplus==201103L
-   std::cout << "C++11" << std::endl;
-   #else
-   std::cout << "C++" << std::endl;
-   #endif
+int main() {
+#if __cplusplus==201402L
+    std::cout << "C++14" << std::endl;
+#elif __cplusplus==201103L
+    std::cout << "C++11" << std::endl;
+#else
+    std::cout << "C++" << std::endl;
+#endif
 
-   return 0;
+    return 0;
 }
 EOF
 
-/llvmtools/bin/clang++ cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+/llvmtools/bin/x86_64-pc-linux-musl-clang++ \
+    cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log
@@ -223,16 +236,16 @@ grep error: cxx11-test.log
 ./a.out
 
 # Check that libunwind, libc++abi, libc++ and LLVM.so are GCC-free:
-llvm-readelf -d /llvmtools/lib/libunwind.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libunwind.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /llvmtools/lib/libc++.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libc++.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc++abi.so.1]
 # Shared library: [libunwind.so.1]
 # Shared library: [libc.so]
-llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 # Shared library: [libunwind.so.1]
-llvm-readelf -d /llvmtools/lib/libLLVM-20.so | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libLLVM.so.19.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libc++.so.1]
 # Shared library: [libc.so]
@@ -240,5 +253,3 @@ llvm-readelf -d /llvmtools/lib/libLLVM-20.so | grep Shared | cut -b 37-
 # If all is well, clean up
 rm -rf build dummy.* atomics-test.* cxx11-test.* a.out
 unset CFLAGS CXXFLAGS
-
-export LD_LIBRARY_PATH=/llvmtools/lib

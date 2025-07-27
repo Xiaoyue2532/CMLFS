@@ -38,5 +38,5 @@ ln -sfv libncurses.so  /usr/lib/libtinfo.so
 # Set the dynamic loader for each executable
 for b in infocmp tabs tic tput tset
 do
-  setDL /usr/bin/$b
+    patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done

@@ -5,46 +5,37 @@
 # there is no clang standalong build that will build
 # against system-installed LLVM
 
-export CFLAGS="-fPIC "
+export CFLAGS="-fPIC"
 export CXXFLAGS=$CFLAGS
 
-# Set clang options:
-export  COPTS="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export COPTS+="-DCLANG_DEFAULT_RTLIB=compiler-rt "
-export COPTS+="-DCLANG_DEFAULT_UNWINDLIB=libunwind "
-export COPTS+="-DCLANG_DEFAULT_CXX_STDLIB=libc++ "
-export COPTS+="-DCLANG_DEFAULT_LINKER=/usr/bin/ld.lld "
-export COPTS+="-DCLANG_INCLUDE_TESTS=OFF "
-
-# Turn off LLVM options:
-export  LOFF="-DLLVM_ENABLE_OCAMLDOC=OFF "
-export LOFF+="-DLLVM_INCLUDE_BENCHMARKS=OFF "
-export LOFF+="-DLLVM_INCLUDE_DOCS=OFF "
-export LOFF+="-DLLVM_INCLUDE_EXAMPLES=OFF "
-export LOFF+="-DLLVM_INCLUDE_TESTS=OFF "
-export LOFF+="-DLLVM_BUILD_RUNTIMES=OFF "
-export LOFF+="-DLLVM_BUILD_RUNTIME=OFF "
-export LOFF+="-DLLVM_BUILD_TOOLS=OFF "
-export LOFF+="-DLLVM_BUILD_UTILS=OFF "
-
-# Enable the same LLVM options used with 
-# previous build
-export  LOPTS="-DLLVM_ENABLE_RTTI=ON "
-export LOPTS+="-DLLVM_ENABLE_EH=ON "
-export LOPTS+="-DLLVM_DEFAULT_TARGET_TRIPLE=${TUPLE} "
-export LOPTS+="-DLLVM_TARGETS_TO_BUILD=Native;host;AMDGPU;BPF "
-
 # Configure source to enable only the clang project:
-cmake -B build -G Ninja -Wno-dev -S llvm \
-      -DLLVM_ENABLE_PROJECTS=clang \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCMAKE_INSTALL_LIBDIR=lib  \
-      -DCLANG_VENDOR="CMLFS 4.0.0" \
-      -DDEFAULT_SYSROOT=/ \
-      $COPTS $LOFF $LOPTS
+cmake \
+    -S llvm -B build \
+    -G Ninja -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DCLANG_INCLUDE_TESTS=OFF \
+    -DDEFAULT_SYSROOT=/ \
+    -DLLVM_BUILD_RUNTIME=OFF \
+    -DLLVM_BUILD_RUNTIMES=OFF \
+    -DLLVM_BUILD_TOOLS=OFF \
+    -DLLVM_BUILD_UTILS=OFF \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_ENABLE_EH=ON \
+    -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_ENABLE_PROJECTS=clang \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_TARGETS_TO_BUILD="Native;host;AMDGPU;BPF"
 
-ninja -C build
+cmake --build build
 
 # If build fails to compile, use below to see what component failed.
 # ninja -C build $TARGET
@@ -73,23 +64,23 @@ export VBUILD=/sources/VBUILD
 mkdir $VBUILD
 mkdir -pv $VBUILD/CLANG/usr/{bin,lib,include,share}
 mkdir -pv $VBUILD/CLANG/usr/lib/cmake
-mkdir -pv $VBUILD/CLANG/usr/lib/clang/17
+mkdir -pv $VBUILD/CLANG/usr/lib/clang/19
 
-mv -v $BUILD/usr/bin/*clang*        $VBUILD/CLANG/usr/bin/
-mv -v $BUILD/usr/bin/c-index-test   $VBUILD/CLANG/usr/bin/
-mv -v $BUILD/usr/bin/diagtool       $VBUILD/CLANG/usr/bin/
-mv -v $BUILD/usr/bin/cc             $VBUILD/CLANG/usr/bin/
+mv -v $BUILD/usr/bin/*clang* $VBUILD/CLANG/usr/bin/
+mv -v $BUILD/usr/bin/c-index-test $VBUILD/CLANG/usr/bin/
+mv -v $BUILD/usr/bin/diagtool $VBUILD/CLANG/usr/bin/
+mv -v $BUILD/usr/bin/cc $VBUILD/CLANG/usr/bin/
 
-mv -v $BUILD/usr/include/clang      $VBUILD/CLANG/usr/include/
-mv -v $BUILD/usr/include/clang-c    $VBUILD/CLANG/usr/include/
-mv -v $BUILD/usr/lib/clang/17/include  $VBUILD/CLANG/usr/lib/clang/17/
-mv -v $BUILD/usr/lib/cmake/clang    $VBUILD/CLANG/usr/lib/cmake/
-mv -v $BUILD/usr/lib/libclang*.a    $VBUILD/CLANG/usr/lib/
-mv -v $BUILD/usr/lib/libclang*.so   $VBUILD/CLANG/usr/lib/
-mv -v $BUILD/usr/lib/libclang.so.*  $VBUILD/CLANG/usr/lib/
+mv -v $BUILD/usr/include/clang $VBUILD/CLANG/usr/include/
+mv -v $BUILD/usr/include/clang-c $VBUILD/CLANG/usr/include/
+mv -v $BUILD/usr/lib/clang/19/include $VBUILD/CLANG/usr/lib/clang/19/
+mv -v $BUILD/usr/lib/cmake/clang $VBUILD/CLANG/usr/lib/cmake/
+mv -v $BUILD/usr/lib/libclang*.a $VBUILD/CLANG/usr/lib/
+mv -v $BUILD/usr/lib/libclang*.so $VBUILD/CLANG/usr/lib/
+mv -v $BUILD/usr/lib/libclang.so.* $VBUILD/CLANG/usr/lib/
 mv -v $BUILD/usr/lib/libclang-cpp.so.* $VBUILD/CLANG/usr/lib/
-mv -v $BUILD/usr/lib/cpp            $VBUILD/CLANG/usr/lib/
-mv -v $BUILD/usr/share/clang        $VBUILD/CLANG/usr/share/
+mv -v $BUILD/usr/lib/cpp $VBUILD/CLANG/usr/lib/
+mv -v $BUILD/usr/share/clang $VBUILD/CLANG/usr/share/
 
 # Install
 cd $VBUILD
@@ -116,7 +107,7 @@ grep -B1 -A1 '^ /usr' dummy.log
 # #include <...> search starts here:
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/17/include
+#  /usr/lib/clang/19/include
 # End of search list.
 
 # Make sure no libraries are loaded from llvmtools
@@ -124,17 +115,16 @@ grep ld.lld:  dummy.log
 # It should output:
 # ld.lld: /lib/Scrt1.o
 # ld.lld: /lib/crti.o
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
 # ld.lld: /tmp/dummy-b69998.o
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
 # ld.lld: /lib/libatomic.so
 # ld.lld: /lib/libc.so
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
-# ld.lld: /usr/lib/clang/17/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
 # ld.lld: /lib/crtn.o
-
 
 # Check if stage2 clang++ supports atomics.
 cat > atomics-test.cpp << "EOF"
@@ -163,7 +153,7 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/17/include
+#  /usr/lib/clang/19/include
 # End of search list.
 
 # Test if stage1 clang supports C++11

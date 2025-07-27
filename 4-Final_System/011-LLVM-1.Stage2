@@ -16,29 +16,32 @@ export CFLAGS="-fPIC "
 export CXXFLAGS=$CFLAGS
 
 # Configure source [to build all of LLVM]
-cmake -B build -S llvm \
+cmake \
+    -B build -S llvm \
     -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="clang" \
     -DCMAKE_CXX_COMPILER="clang++" \
-    -DCMAKE_INSTALL_LIBDIR="lib" \
     -DCMAKE_INSTALL_PREFIX="/usr" \
     -DCMAKE_AR="/llvmtools/bin/llvm-ar" \
     -DCMAKE_NM="/llvmtools/bin/llvm-nm" \
     -DCMAKE_RANLIB="/llvmtools/bin/llvm-ranlib" \
-    -DCLANG_DEFAULT_LINKER="/usr/bin/ld.lld" \
+    -DCLANG_BUILD_EXAMPLES=OFF \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
-    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
     -DCOMPILER_RT_CXX_LIBRARY=libcxx \
     -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
     -DDEFAULT_SYSROOT="/usr" \
     -DENABLE_LINKER_BUILD_ID=ON \
     -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_INCLUDE_TESTS=OFF \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
@@ -47,10 +50,19 @@ cmake -B build -S llvm \
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
     -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLIBCXX_INCLUDE_BENCHMARKS=OFF \
+    -DLIBCXX_INCLUDE_DOCS=OFF \
+    -DLIBCXX_INCLUDE_TESTS=OFF \
     -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBUNWIND_INCLUDE_DOCS=OFF \
+    -DLIBUNWIND_INCLUDE_TESTS=OFF \
     -DLIBUNWIND_INSTALL_HEADERS=ON \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
+    -DLLVM_BUILD_BENCHMARKS=OFF \
+    -DLLVM_BUILD_DOCS=OFF \
+    -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_BUILD_UTILS=OFF \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
@@ -61,8 +73,8 @@ cmake -B build -S llvm \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
     -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
     -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=ON \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
@@ -70,8 +82,9 @@ cmake -B build -S llvm \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
-    -DLLVM_INSTALL_UTILS=ON \
     -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
+    -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
+    -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host;ARM" \
     -DLLVM_TARGET_ARCH=host \
@@ -105,35 +118,39 @@ cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/Extr
 
 # Install
 cmake --install build --strip
-cp -v ./clang/include/clang/ExtractAPI/APIRecords.inc /usr/include/clang/ExtractAPI
-rm -rv /usr/bin/python3
+
+ln -sv clang-19 /usr/bin/x86_64-pc-linux-musl-clang
+ln -sv clang-19 /usr/bin/x86_64-pc-linux-musl-clang++
+
+# cp -v ./clang/include/clang/ExtractAPI/APIRecords.inc /usr/include/clang/ExtractAPI
+# rm -rv /usr/bin/python3
 
 # Fix the dynamic linker for the executables:
-for b in bugpoint c-index-test clang-20 count diagtool dsymutil FileCheck \
-         llc lld lli lli-child-target not obj2yaml opt sancov sanstats \
-         split-file UnicodeNameMappingGenerator verify-uselistorder yaml2obj \
-         yaml-bench amdgpu-arch nvptx-arch
+for b in bugpoint c-index-test clang-19 count diagtool dsymutil FileCheck \
+    llc lld lli lli-child-target not obj2yaml opt sancov sanstats \
+    split-file UnicodeNameMappingGenerator verify-uselistorder yaml2obj \
+    yaml-bench amdgpu-arch nvptx-arch
 do
   patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done
 
 for b in check extdef-mapping format linker-wrapper \
-         offload-bundler offload-packager  \
-         rename repl scan-deps scan-deps tblgen 
+    offload-bundler offload-packager  \
+    rename repl scan-deps scan-deps tblgen 
 do
   patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/clang-$b
 done
 
 for b in ar as bcanalyzer cat cfi-verify config cov c-test cvtres cxxdump \
-         cxxfilt cxxmap debuginfod debuginfod-find diff dis dwarfdump \
-         dwarfutil dwp exegesis extract gsymutil ifs jitlink jitlink-executor \
-         libtool-darwin link lipo lto lto2 mc mca ml modextract mt nm objcopy \
-         objdump opt-report pdbutil PerfectShuffle profdata profgen rc readobj \
-         reduce remark-size-diff rtdyld sim size split stress strings \
-         symbolizer tapi-diff tblgen tli-checker undname xray remarkutil \
-         debuginfo-analyzer
+    cxxfilt cxxmap debuginfod debuginfod-find diff dis dwarfdump \
+    dwarfutil dwp exegesis extract gsymutil ifs jitlink jitlink-executor \
+    libtool-darwin link lipo lto lto2 mc mca ml modextract mt nm objcopy \
+    objdump opt-report pdbutil PerfectShuffle profdata profgen rc readobj \
+    reduce remark-size-diff rtdyld sim size split stress strings \
+    symbolizer tapi-diff tblgen tli-checker undname xray remarkutil \
+    debuginfo-analyzer
 do
-  patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/llvm-$b
+    patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/llvm-$b
 done
 
 # NOTE: stage2 clang loads libc shared object from llvmtools. 
@@ -145,12 +162,13 @@ EOF
 
 # NOTE: Stage2 clang looks for ld/lld first /llvmtools/bin
 # Disable it:
-mv -v  /llvmtools/bin/lld{,.disabled}
+mv -v /llvmtools/bin/lld{,.disabled}
 ln -sfv ld.lld /usr/bin/ld
 
 # Test stage2 Clang
-echo "int main(){}" > dummy.c
-/usr/bin/clang dummy.c -v -Wl,--verbose &> dummy.log
+echo "int main() {}" > dummy.c
+/usr/bin/x86_64-pc-linux-musl-clang \
+    dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
 # Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
@@ -170,22 +188,22 @@ grep -B1 -A1 '^ /usr' dummy.log
 # #include <...> search starts here:
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/20/include
+#  /usr/lib/clang/19/include
 # End of search list.
 
 # Make sure no libraries are loaded from llvmtools
 grep ld:  dummy.log
 # ld.lld: /lib/Scrt1.o
 # ld.lld: /lib/crti.o
-# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
 # ld.lld: /tmp/dummy-1f0e32.o
-# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
 # ld.lld: /lib/libatomic.so
 # ld.lld: /lib/libc.so
-# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
 # ld.lld: /lib/libunwind.so
-# ld.lld: /usr/lib/clang/20/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
+# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
 # ld.lld: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
@@ -195,14 +213,14 @@ std::atomic<int> x;
 std::atomic<short> y;
 std::atomic<char> z;
 int main() {
-  ++z;
-  ++y;
-  return ++x;
+    ++z;
+    ++y;
+    return ++x;
 }
 EOF
 
-/usr/bin/clang++ \
-atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
+/usr/bin/x86_64-pc-linux-musl-clang++ \
+    atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
 
 # Check for errors during compile or link:
 grep error:  atomics-test.log
@@ -215,27 +233,28 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/20/include
+#  /usr/lib/clang/19/include
 # It should be in this order
 
 # Test if stage1 clang supports C++11
 cat > cxx11-test.cpp << "EOF"
 #include <iostream>
 
-int main(){
-   #if __cplusplus==201402L
-   std::cout << "C++14" << std::endl;
-   #elif __cplusplus==201103L
-   std::cout << "C++11" << std::endl;
-   #else
-   std::cout << "C++" << std::endl;
-   #endif
+int main() {
+#if __cplusplus==201402L
+    std::cout << "C++14" << std::endl;
+#elif __cplusplus==201103L
+    std::cout << "C++11" << std::endl;
+#else
+    std::cout << "C++" << std::endl;
+#endif
 
-   return 0;
+    return 0;
 }
 EOF
 
-/usr/bin/clang++ cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+/usr/bin/x86_64-pc-linux-musl-clang++ \
+    cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log
@@ -245,13 +264,13 @@ grep error: cxx11-test.log
 ./a.out
 
 # Check that libunwind, libc++abi, libc++ and LLVM.so are GCC-free:
-llvm-readelf -d /usr/lib/libunwind.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libunwind.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /usr/lib/libc++.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libc++.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /usr/lib/libc++abi.so.1.0  | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /usr/lib/libLLVM-20.so | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libLLVM.so.19.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libzstd.so.1]
 # Shared library: [libterminfo.so]
@@ -260,17 +279,17 @@ llvm-readelf -d /usr/lib/libLLVM-20.so | grep Shared | cut -b 37-
 
 # If all is well, clean up
 rm -rf build dummy.* atomics-test.* cxx11-test.*
-unset CT CTG CP CRT CLG CLCPP CLCPPA CUW CLLVM COFF CFLAGS CXXFLAGS
+unset CFLAGS CXXFLAGS
 
 # Set the default compiler for chroot to stage2 clang:
 export CC=clang CXX=clang++
 
-# Many packages use the name cc to call the C compiler. To
-# satisfy those packages, create a symlink
-ln -sv clang-20 /usr/bin/cc
+# # Many packages use the name cc to call the C compiler. To
+# # satisfy those packages, create a symlink
+# ln -sv clang-19 /usr/bin/cc
 
 # Create a symlink required by the FHS for "historical" reasons
-ln -sv ../bin/clang-20 /usr/lib/cpp
+ln -sv ../bin/clang-19 /usr/lib/cpp
 
 # fix posixtz need c99
 cp ../../cports/main/llvm/files/c99 /usr/bin/c99

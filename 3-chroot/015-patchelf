@@ -23,15 +23,15 @@ AS=llvm-as \
 # Build and install to llvmtools
 make -j`nproc --all` && make install
 
-# Create a script to easily set the dynamic loader/linker/interpreter
-# for a binary:
-cat > /llvmtools/bin/setDL << EOF
-#!/bin/sh
-# Set the dynamic loader/linker/interpreter of a binary
-# USAGE: setDL a.out
+# # Create a script to easily set the dynamic loader/linker/interpreter
+# # for a binary:
+# cat > /llvmtools/bin/setDL << EOF
+# #!/bin/sh
+# # Set the dynamic loader/linker/interpreter of a binary
+# # USAGE: setDL a.out
 
-export PROOT=" "
-patchelf --set-interpreter ${PROOT}/lib/ld-musl-${MCA}.so.1 $1
-EOF
+# export PROOT=" "
+# patchelf --set-interpreter ${PROOT}/lib/ld-musl-${MCA}.so.1 $1
+# EOF
 
-chmod -v +x /llvmtools/bin/setDL
+# chmod -v +x /llvmtools/bin/setDL
