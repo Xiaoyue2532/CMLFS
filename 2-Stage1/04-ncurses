@@ -4,20 +4,18 @@
 # Ensure gawk exist on the host
 mkdir build
 pushd build
-    CC=clang  \
+    CC=clang \
     CXX=clang++ \
-    AR=llvm-ar \
-    RANLIB=llvm-ranlib \
+    LD=ld.lld \
     ../configure AWK=gawk
-    make -C include
-    make -C progs tic
+    make -C include -j`nproc --all`
+    make -C progs tic -j`nproc --all`
 popd
 
 # Build
-CC=clang  \
+CC=clang \
 CXX=clang++ \
-AR=llvm-ar \
-RANLIB=llvm-ranlib \
+LD=ld.lld \
 ./configure \
     --prefix=/llvmtools \
     --host=x86_64-pc-linux-musl \

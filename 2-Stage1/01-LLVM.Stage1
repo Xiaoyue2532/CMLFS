@@ -2,12 +2,11 @@
 # Build as cmlfs
 #
 # o Reuse llvm-project source tree from before
-#
 
-# - libunwind/include/unwind.h: "__libunwind_config.h" -> <__libunwind_config.h>
-# - libunwind/include/unwind.h: "unwind_itanium.h" -> <unwind_itanium.h>
-
-# export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
+# no need to revert unwind.h
+# must not use export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
+# or /cgnutools/lib/libLLVM.so will prior to build/lib/libLLVM.so
+# which cause runtime build failure
 export CFLAGS="-fPIC"
 export CXXFLAGS=$CFLAGS
 
@@ -105,28 +104,6 @@ ninja -C build clang # ..................................... PASS
 ninja -C build libclang # .... 31 .......................... PASS
 ninja -C build # ............ 508 .......................... PASS
 
-# # LLVM-20.1.6 support is still weird
-# export LD_LIBRARY_PATH=/home/arch/sources/llvm-project-20.1.6.src/build/lib
-
-# rm /cgnutools/bin/{ld,llvm-strip}
-# ln -s build/bin/ld.lld /cgnutools/bin/ld
-# ln -s build/bin/llvm-strip /cgnutools/bin/llvm-strip
-
-# # Fix broken libunwind
-# ln -s /cgnutools/lib/libunwind.so.1.0 /llvmtools/lib/libunwind.so.1.0
-# ln -s libunwind.so.1.0 /llvmtools/lib/libunwind.so.1
-# ln -s libunwind.so.1 /llvmtools/lib/libunwind.so
-
-# # Fix broken libc++
-# ln -s /cgnutools/lib/libc++.so.1.0 /llvmtools/lib/libc++.so.1.0
-# ln -s libc++.so.1.0 /llvmtools/lib/libc++.so.1
-# ln -s libc++.so.1 /llvmtools/lib/libc++.so
-
-# # Fix broken libc++abi
-# ln -s /cgnutools/lib/libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1.0
-# ln -s libc++abi.so.1.0 /llvmtools/lib/libc++abi.so.1
-# ln -s libc++abi.so.1 /llvmtools/lib/libc++abi.so
-
 # install to llvmtools
 cmake --install build --strip
 
@@ -134,8 +111,8 @@ cmake --install build --strip
 ln -sv clang-19 /llvmtools/bin/x86_64-pc-linux-musl-clang
 ln -sv clang-19 /llvmtools/bin/x86_64-pc-linux-musl-clang++
 
-# # Clear variables used in the CMake invocation:
-# unset CFLAGS CXXFLAGS
+# Clear variables used in the CMake invocation:
+unset CFLAGS CXXFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
 export PATH=/llvmtools/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
@@ -252,4 +229,3 @@ llvm-readelf -d /llvmtools/lib/libLLVM.so.19.1 | grep Shared | cut -b 37-
 
 # If all is well, clean up
 rm -rf build dummy.* atomics-test.* cxx11-test.* a.out
-unset CFLAGS CXXFLAGS

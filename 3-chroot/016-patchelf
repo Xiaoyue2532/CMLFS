@@ -11,14 +11,8 @@
 CC=clang \
 CXX=clang++ \
 LD=ld.lld \
-RANLIB=llvm-ranlib \
-STRIP=llvm-strip \
-OBJDUMP=llvm-objdump \
-READELF=llvm-readelf \
-OBJCOPY=llvm-objcopy \
-AR=llvm-ar \
-AS=llvm-as \
-./configure --prefix=/llvmtools
+./configure \
+    --prefix=/llvmtools
 
 # Build and install to llvmtools
 make -j`nproc --all` && make install

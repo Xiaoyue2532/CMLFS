@@ -1,0 +1,11 @@
+CC=clang \
+LD=ld.lld \
+./configure \
+    --prefix=/llvmtools \
+    --libdir=/llvmtools/lib/libfakeroot \
+    --disable-static \
+    --with-ipc=sysv
+
+make -j`nproc --all`
+
+make install

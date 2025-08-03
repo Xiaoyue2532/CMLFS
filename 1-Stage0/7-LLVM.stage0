@@ -96,7 +96,7 @@ cmake \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH="host"
 
-# enable if host has lld: -DLLVM_ENABLE_LLD=ON \
+# no -DLLVM_ENABLE_LLD=ON \
 
 # compile
 cmake --build build

@@ -27,9 +27,6 @@ patch -Np1 -i ../../cports/main/musl/patches/default-locpath.patch
 # Configure
 CC=clang \
 LD=ld.lld \
-AR=llvm-ar \
-RANLIB=llvm-ranlib \
-AS=llvm-as \
 LIBCC="/llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a " \
 ./configure \
     --prefix=/usr \
@@ -44,7 +41,7 @@ make -j`nproc --all` && make install
 # Provide minimal libssp_nonshared.a so we don't need libssp from gcc
 export CFLAGS="-Wno-implicit-int"
 clang -fpie $CFLAGS -c ../../CMLFS/files/musl-alpine/__stack_chk_fail_local.c -o __stack_chk_fail_local.o
-llvm-ar r libssp_nonshared.a __stack_chk_fail_local.o
+ar r libssp_nonshared.a __stack_chk_fail_local.o
 cp -v libssp_nonshared.a /usr/lib/
 unset CFLAGS
 
@@ -53,10 +50,10 @@ ln -sv ../lib/libc.so /usr/bin/ldd
 
 # Set the CPU architechture
 case $(uname -m) in
-     i686) export CARCH="i386"    ;;
-   x86_64) export CARCH="x86_64"  ;;
-     arm*) export CARCH="arm"     ;;
-  aarch64) export CARCH="aarch64" ;;
+    i686) export CARCH="i386"    ;;
+    x86_64) export CARCH="x86_64"  ;;
+    arm*) export CARCH="arm"     ;;
+    aarch64) export CARCH="aarch64" ;;
 esac
 
 # Create config for dynamic library loading:
@@ -68,7 +65,7 @@ EOF
 # Create compatibility link for i686, as some software, like SMPlayer
 # expect i686 instead of i386
 case $(uname -m) in
-     i686) ln -sv ../usr/lib/libc.so  /lib/ld-musl-i686.so.1 ;;
+    i686) ln -sv ../usr/lib/libc.so /lib/ld-musl-i686.so.1 ;;
 esac
 
 # Install a ldconfig script.

@@ -17,5 +17,3 @@ mount -vt tmpfs tmpfs $CMLFS/run
 if [ -h $CMLFS/dev/shm ]; then
   mkdir -pv $CMLFS/$(readlink $CMLFS/dev/shm)
 fi
-
-

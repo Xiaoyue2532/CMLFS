@@ -4,8 +4,8 @@
 # Configure source to install in /opt/openssl
 CC=clang CXX=clang++ \
 ./config \
-    --prefix=/usr \
-    --openssldir=/etc/ssl \
+    --prefix=/llvmtools \
+    --openssldir=/llvmtools/etc/ssl \
     --libdir=lib \
     shared \
     zlib-dynamic \
@@ -16,5 +16,4 @@ CC=clang CXX=clang++ \
 make -j`nproc --all`
 
 # Install to /opt
-sed -i '/INSTALL_LIBS/s/libcrypto.a libssl.a//' Makefile
 make install

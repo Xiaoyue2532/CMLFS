@@ -1,0 +1,10 @@
+# pacman - stage2
+# Install pacman to /usr with the temporary pacman
+
+# Full build, clean pkgdir first, with log, forcely, without checking integrity
+makepkg -CLf --skipinteg
+
+# Repackaging, with log, forcely, without checking integrity
+makepkg -RLf --skipinteg
+
+pacman -U pkgname-pkgver-arch.tar.zst
