@@ -18,6 +18,7 @@ chroot --userspec=1000:999 "$CMLFS" /llvmtools/bin/env -i \
     HOME=/home/tester \
     TERM="$TERM" \
     PS1='(cmlfs chroot) [\u@\h \W]\$ ' \
-    PATH=/root/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    PATH=/home/tester/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    LANG=zh_CN \
     /llvmtools/bin/bash --login +h
     

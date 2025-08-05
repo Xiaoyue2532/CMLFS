@@ -6,6 +6,7 @@ chroot "$CMLFS" /llvmtools/bin/env -i \
     TERM="$TERM" \
     PS1='(cmlfs chroot) [\u@\h \W]\$ ' \
     PATH=/root/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    LANG=zh_CN \
     /llvmtools/bin/bash --login +h
 
 # Establish variables for build

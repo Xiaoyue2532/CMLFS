@@ -17,7 +17,6 @@ export CXXFLAGS=$CFLAGS
 
 # Configure source [to build all of LLVM]
 cmake \
-    -B build -S llvm \
     -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER="clang" \
@@ -64,6 +63,7 @@ cmake \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_UTILS=OFF \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_LIBEDIT=OFF \
@@ -86,10 +86,11 @@ cmake \
     -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
     -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
-    -DLLVM_TARGETS_TO_BUILD="Native;host;ARM" \
+    -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH=host \
     -DZLIB_INCLUDE_DIR="/usr/include" \
-    -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so"
+    -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so" \
+    ../llvm
 
 # compile (~ 4,048 targets)
 cmake --build build

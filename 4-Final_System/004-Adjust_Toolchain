@@ -3,8 +3,8 @@
 
 # Create a new configuration for stage1 clang:
 touch /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg
-ln -sv clang-20 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang
-ln -sv clang-20 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang++
+ln -sfv clang-19 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang
+ln -sfv clang-19 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang++
 
 # Re-configure clang to use new sysroot (/) with newly built musl Libc
 echo "--sysroot=/ " > \
@@ -22,7 +22,7 @@ cat >> /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg << EOF
 -I/llvmtools/include/c++/v1
 -I/usr/include
 -I/llvmtools/include
--I/llvmtools/lib/clang/20/include
+-I/llvmtools/lib/clang/19/include
 EOF
 
 # Update the build environment
@@ -30,8 +30,8 @@ export CC=$(uname -m)-pc-linux-musl-clang
 export CXX=$(uname -m)-pc-linux-musl-clang++
 
 # Adjust the library search path for the dynamic loader in llvmtools:
-cp -v /llvmtools/etc/ld-musl-${MCA}.path{,.orig}
-cat > /llvmtools/etc/ld-musl-${MCA}.path <<EOF
+cp -v /llvmtools/etc/ld-musl-x86_64.path{,.orig}
+cat > /llvmtools/etc/ld-musl-x86_64.path <<EOF
 /lib
 /usr/lib
 /llvmtools/lib
@@ -55,9 +55,9 @@ llvm-readelf -l a.out | grep ': /lib'
 
 # Make sure that we're setup to use the correct start files: 
 grep 'ld.lld:' dummy.log | grep 'crt[1in]'
-#ld.lld: /usr/lib/Scrt1.o
-#ld.lld: /usr/lib/crti.o
-#ld.lld: /usr/lib/crtn.o
+# ld.lld: /usr/lib/Scrt1.o
+# ld.lld: /usr/lib/crti.o
+# ld.lld: /usr/lib/crtn.o
 
 # Verify that the compiler is searching for the correct 
 # header files: 
@@ -75,4 +75,3 @@ grep -o -- -L/usr/lib dummy.log && grep -o -- -L/lib dummy.log
 # Once everything is working correctly, clean up 
 # the test files:
 rm -v a.out dummy.log
-

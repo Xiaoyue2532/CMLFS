@@ -2,7 +2,7 @@
 # Build & install under chroot
 
 # Build
-CC=$CC AR=llvm-ar make PREFIX=/usr
+CC=$CC make PREFIX=/usr
 
 # Install
-CC=$CC AR=llvm-ar make PREFIX=/usr install
+CC=$CC make PREFIX=/usr install

@@ -27,7 +27,7 @@ patch -Np1 -i ../../cports/main/musl/patches/default-locpath.patch
 # Configure
 CC=clang \
 LD=ld.lld \
-LIBCC="/llvmtools/lib/clang/20/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a " \
+LIBCC=`clang -print-libgcc-file-name` \
 ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \

@@ -2,7 +2,7 @@
 # This section is done in Chroot environment
 
 # Configure source with clang
-./configure -\
+./configure \
     -prefix=/usr        \
     --sysconfdir=/etc     \
     --localstatedir=/var  \

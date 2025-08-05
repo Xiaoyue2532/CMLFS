@@ -1,0 +1,5 @@
+# Final System: Kernel headers
+# Build under chroot
+#
+
+makepkg --skipinteg
