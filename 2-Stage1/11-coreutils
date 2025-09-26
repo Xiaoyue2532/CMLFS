@@ -3,7 +3,7 @@
 
 # [Don't] Re-create configure script 
 # [ ... it usually fails]
-#autoreconf -vif
+# autoreconf -vif
 
 # Cross Compiling the configure script 
 # does not does not determine the correct 
@@ -19,13 +19,12 @@ EOF
 # Suppress a test which on some machines can loop forever:
 # sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 
-# if build under root user
-export FORCE_UNSAFE_CONFIGURE=1
-
 # Configure source with clang
 CC=clang CXX=clang++ \
+LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \
@@ -35,5 +34,3 @@ RANLIB=llvm-ranlib STRIP=llvm-strip \
 
 # Build and install to toolchain
 make -j`nproc --all` && make install
-
-unset FORCE_UNSAFE_CONFIGURE

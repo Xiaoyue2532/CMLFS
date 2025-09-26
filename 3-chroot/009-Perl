@@ -3,7 +3,7 @@
 
 # Set to build bundled zlib as perl may
 # not build with zlib-ng
-export BUILD_ZLIB=True
+export BUILD_ZLIB=False
 
 # Set to avoid compiling a bundled bzip2.
 # Use the bzip2 installed in llvmtools

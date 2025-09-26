@@ -44,24 +44,23 @@ ln -sv libncurses.so /llvmtools/lib/libtinfo.so
 ln -sv libncurses.so /llvmtools/lib/libtinfow.so
 
 # fix python cannot find term.h
-cd /llvmtools/include/ncursesw
-mv * ../
+cd /llvmtools/include/ncursesw && mv * ../
 
-ln -s ../curses.h
-ln -s ../cursesapp.h
-ln -s ../cursesf.h
-ln -s ../cursesm.h
-ln -s ../cursesp.h
-ln -s ../cursesw.h
-ln -s ../cursslk.h
-ln -s ../eti.h
-ln -s ../etip.h
-ln -s ../form.h
-ln -s ../menu.h
-ln -s ../ncurses.h
-ln -s ../ncurses_dll.h
-ln -s ../panel.h
-ln -s ../term.h
-ln -s ../term_entry.h
-ln -s ../termcap.h
+ln -s ../curses.h &&
+ln -s ../cursesapp.h &&
+ln -s ../cursesf.h &&
+ln -s ../cursesm.h &&
+ln -s ../cursesp.h &&
+ln -s ../cursesw.h &&
+ln -s ../cursslk.h &&
+ln -s ../eti.h &&
+ln -s ../etip.h &&
+ln -s ../form.h &&
+ln -s ../menu.h &&
+ln -s ../ncurses.h &&
+ln -s ../ncurses_dll.h &&
+ln -s ../panel.h &&
+ln -s ../term.h &&
+ln -s ../term_entry.h &&
+ln -s ../termcap.h &&
 ln -s ../unctrl.h
