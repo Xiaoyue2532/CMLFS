@@ -1,6 +1,11 @@
 # pacman - stage1
 # install pacman to the temporary toolchain /llvmtools
 
+CC=clang CXX=clang++ \
+LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 meson \
     --prefix=/llvmtools \
     --buildtype=plain \
@@ -17,9 +22,3 @@ meson \
 meson compile -C build
 
 meson install -C build
-
-# copy all configuration files to /llvmtools
-cp -v alpm.sysusers /llvmtools/etc
-cp -v makepkg.conf /llvmtools/etc
-cp -v pacman.conf /llvmtools/etc
-cp -v rust.conf /llvmtools/etc

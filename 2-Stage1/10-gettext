@@ -20,3 +20,9 @@ cp -v \
     ./gettext-tools/src/msgfmt \
     ./gettext-tools/src/msgmerge \
     ./gettext-tools/src/xgettext /llvmtools/bin
+
+mkdir /llvmtools/bin/.libs
+cp -v \
+    ./gettext-tools/src/.libs/msgfmt \
+    ./gettext-tools/src/.libs/msgmerge \
+    ./gettext-tools/src/.libs/xgettext /llvmtools/bin/.libs

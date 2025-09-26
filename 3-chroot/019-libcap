@@ -1,0 +1,10 @@
+# Stage1: libcap2
+# This section is done in Chroot environment
+
+make CC=clang AR=llvm-ar RANLIB=llvm-ranlib OBJCOPY=llvm-objcopy \
+    -j`nproc --all`
+
+make CC=clang AR=llvm-ar RANLIB=llvm-ranlib OBJCOPY=llvm-objcopy \
+    RAISE_SETFCAP=no lib=lib prefix=/llvmtools install
+
+chmod -v 755 /llvmtools/lib/libcap.so

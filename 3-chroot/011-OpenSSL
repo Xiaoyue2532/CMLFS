@@ -1,0 +1,19 @@
+# Final System: OpenSSL
+# Build & install under chroot
+
+# Configure source to install in /opt/openssl
+CC=clang CXX=clang++ \
+./config \
+    --prefix=/llvmtools \
+    --openssldir=/llvmtools/etc/ssl \
+    --libdir=lib \
+    shared \
+    zlib-dynamic \
+    enable-ktls \
+    -Wa,--noexecstack
+
+# Compile
+make -j`nproc --all`
+
+# Install to /opt
+make install

@@ -1,15 +1,19 @@
 # Stage1: Zstd
 # This section is done in Chroot environment
 
-# Source is hard coded for ar. Create a link
-
 CC=clang CXX=clang++ \
+AR=llvm-ar \
     make -j`nproc --all`
-
 CC=clang CXX=clang++ \
+AR=llvm-ar \
     make -C contrib/pzstd -j`nproc --all`
 
+CC=clang CXX=clang++ \
+AR=llvm-ar \
 make prefix=/llvmtools \
     install
+
+CC=clang CXX=clang++ \
+AR=llvm-ar \
 make PREFIX=/llvmtools \
     -C contrib/pzstd install

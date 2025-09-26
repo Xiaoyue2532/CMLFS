@@ -72,7 +72,7 @@ messagebus:x:18:
 input:x:24:
 mail:x:34:
 nogroup:x:99:
-users:x:999:
+arch:x:1000:
 EOF
 
 # To remove the "I have no name!" prompt, start 

@@ -1,3 +1,6 @@
+# Stage1: fakeroot
+# This section is done in Chroot environment
+
 CC=clang CXX=clang++ \
 LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
@@ -9,6 +12,7 @@ OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
     --disable-static \
     --with-ipc=sysv
 
+# you may need to comment out INT_SEND_GET_XATTR
 make -j`nproc --all`
 
 make install

@@ -2,13 +2,10 @@
 # Build under chroot
 # Optional package: Text editor for convenience or trouble shooting
 
-# Set flags, so curses headers can be found in /llvmtools/include
-export LDFLAGS="-L/llvmtools/lib -lncursesw "
-export CPPFLAGS="-I/llvmtools/include/ncursesw "
-
 # Configure source with clang
 CC=clang CXX=clang++ \
 LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
@@ -22,5 +19,3 @@ OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 make -j`nproc --all` && make install
 
 cp -v doc/sample.nanorc /llvmtools/etc/nanorc
-
-unset LDFLAGS CPPFLAGS

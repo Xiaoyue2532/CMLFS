@@ -1,24 +1,26 @@
 Setting up to build packages with pacman
 Create a new user by adding the following to /etc/passwd:
 
-tester:x:1000:999:tester:/home/tester:/bin/bash
+arch:x:1000:1000:arch:/home/arch:/bin/bash
 
-Where 999 is the ID of the users group. Check /etc/group for the correct ID, or if users is not present in that file, add the following to it.
+Where 1000 is the ID of the arch group. Check /etc/group for the correct ID, or if arch is not present in that file, add the following to it.
 
-users:x:999:
+arch:x:1000:
 
 Create a home directory:
 
-mkdir -v /home/tester
-chown -Rv tester:users /home/tester
+mkdir -v /home/arch
+chown -Rv arch:arch /home/arch
 
-Exit your current chroot, then chroot into your new user (make sure 1000, 999 and tester are set to the proper values for your system):
+Exit your current chroot, then chroot into your new user (make sure 1000, 1000 and arch are set to the proper values for your system):
 
-chroot --userspec=1000:999 "$CMLFS" /llvmtools/bin/env -i \
-    HOME=/home/tester \
+export CMLFS="/mnt1"
+
+chroot --userspec=1000:1000 "$CMLFS" /llvmtools/bin/env -i \
+    HOME=/home/arch \
     TERM="$TERM" \
     PS1='(cmlfs chroot) [\u@\h \W]\$ ' \
-    PATH=/home/tester/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
     LANG=zh_CN \
     /llvmtools/bin/bash --login +h
     

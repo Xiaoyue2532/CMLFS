@@ -10,13 +10,13 @@
 exit
 
 # As root, strip the binaries in llvmtools
-/llvmtools/bin/find /llvmtools/bin/ -maxdepth 1 -type f -exec \
-     /llvmtools/bin/llvm-strip --strip-debug {} \;
-/llvmtools/bin/find /llvmtools/lib/ -maxdepth 1 -type f -exec \
-     /llvmtools/bin/llvm-strip --strip-debug {} \;
+find $CMLFS/llvmtools/bin/ -maxdepth 1 -type f -exec \
+     strip --strip-debug {} \;
+find $CMLFS/llvmtools/lib/ -maxdepth 1 -type f -exec \
+     strip --strip-debug {} \;
 
 # Remove the documentation:
-rm -rf /llvmtools/{,share}/{info,man,doc}
+rm -rf $CMLFS/llvmtools/{,share}/{info,man,doc}
 
 # Remove unneeded files:
-find /llvmtools/{lib,libexec} -name \*.la -delete
+find $CMLFS/llvmtools/{lib,libexec} -name \*.la -delete
