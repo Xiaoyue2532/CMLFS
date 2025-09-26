@@ -1,0 +1,26 @@
+# cgnutools: compiler-rt
+# Build as cmlfs
+#
+# o Use patches from Chimera Linux
+# o build libunwind as building stage0 clang requires it
+# o Use the monorepo source, i.e llvm-project-x.x.x.tar.xz
+
+cmake \
+    -S compiler-rt -B build-rt \
+    -G Ninja -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/llvmtools" \
+    -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-gcc" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++" \
+    -DCMAKE_AR="/cgnutools/bin/x86_64-cmlfs-linux-musl-ar" \
+    -DCMAKE_NM="/cgnutools/bin/x86_64-cmlfs-linux-musl-nm" \
+    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-cmlfs-linux-musl-ranlib" \
+    -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
+    -DCOMPILER_RT_INCLUDE_TESTS=OFF \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF

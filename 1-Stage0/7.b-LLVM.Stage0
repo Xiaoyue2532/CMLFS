@@ -46,7 +46,6 @@ cmake \
     -DCOMPILER_RT_BUILD_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
-    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
@@ -97,6 +96,12 @@ cmake \
     -DLLVM_TARGET_ARCH="host" \
     -DLLVM_USE_LINKER=mold
 
+# -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
+# Must not use -DLLVM_USE_LLD=ON or  or runtime build would fail
+# probably because we do not have compiler-rt in this stage
+# mold or lld would be useful in the following stages, but not this one
+cp -r ../build-rt/_install/clang ./lib/
+
 # compile
 cmake --build build
 
@@ -142,28 +147,30 @@ llvm-readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
 
-# Check if the correct start files are used
-grep  'crt[1in]' dummy.log | grep ld:
-# Should output:
-# ld: /llvmtools/lib/Scrt1.o
-# ld: /llvmtools/lib/crti.o
-# ld: /llvmtools/lib/crtn.o
+# **Sadly, "ld.mold --verbose" outputs nothing**
+# # Check if the correct start files are used
+# grep  'crt[1in]' dummy.log | grep ld.mold:
+# # Should output:
+# # ld.mold: /llvmtools/lib/Scrt1.o
+# # ld.mold: /llvmtools/lib/crti.o
+# # ld.mold: /llvmtools/lib/crtn.o
 
-# Make sure no libraries are loaded from the host
-grep ld:  dummy.log
-# Should output:
-# ld: /llvmtools/lib/Scrt1.o
-# ld: /llvmtools/lib/crti.o
-# ld: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
-# ld: /tmp/dummy-ffb57c.o
-# ld: /mnt/cmlfs/cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# ld: /llvmtools/lib/libunwind.so
-# ld: /llvmtools/lib/libatomic.so
-# ld: /llvmtools/lib/libc.so
-# ld: /cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# ld: /llvmtools/lib/libunwind.so
-# ld: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
-# ld: /llvmtools/lib/crtn.o
+# **Sadly, "ld.mold --verbose" outputs nothing**
+# # Make sure no libraries are loaded from the host
+# grep ld.mold:  dummy.log
+# # Should output:
+# # ld.mold: /llvmtools/lib/Scrt1.o
+# # ld.mold: /llvmtools/lib/crti.o
+# # ld.mold: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
+# # ld.mold: /tmp/dummy-ffb57c.o
+# # ld.mold: /mnt/cmlfs/cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /llvmtools/lib/libunwind.so
+# # ld.mold: /llvmtools/lib/libatomic.so
+# # ld.mold: /llvmtools/lib/libc.so
+# # ld.mold: /cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /llvmtools/lib/libunwind.so
+# # ld.mold: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
+# # ld.mold: /llvmtools/lib/crtn.o
 
 # Verify that stage0 clang is searching for the correct header files:
 grep -B2 -A1 '^ /llvmtools/usr/include' dummy.log

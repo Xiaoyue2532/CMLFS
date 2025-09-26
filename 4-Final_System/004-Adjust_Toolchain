@@ -54,10 +54,10 @@ llvm-readelf -l a.out | grep ': /lib'
 # [Requesting program interpreter: /lib/ld-musl-arch64.so.1]
 
 # Make sure that we're setup to use the correct start files: 
-grep 'ld:' dummy.log | grep 'crt[1in]'
-# ld: /usr/lib/Scrt1.o
-# ld: /usr/lib/crti.o
-# ld: /usr/lib/crtn.o
+grep 'ld.mold:' dummy.log | grep 'crt[1in]'
+# ld.mold: /usr/lib/Scrt1.o
+# ld.mold: /usr/lib/crti.o
+# ld.mold: /usr/lib/crtn.o
 
 # Verify that the compiler is searching for the correct 
 # header files: 

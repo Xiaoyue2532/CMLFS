@@ -93,13 +93,14 @@ llvm-readelf -l a.out | grep ': /lib'
 # Shoud output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
 
-# Check if the correct start files are used
-grep  'crt[1in]' dummy.log | grep ld:
-# Should output:
-# ld: /lib/Scrt1.o
-# ld: /lib/crti.o
-# ld: /lib/crtn.o
-# * /lib is a link to /usr/lib, therefore this is acceptable
+# **Sadly, "ld.mold --verbose" outputs nothing**
+# # Check if the correct start files are used
+# grep  'crt[1in]' dummy.log | grep ld.mold:
+# # Should output:
+# # ld.mold: /lib/Scrt1.o
+# # ld.mold: /lib/crti.o
+# # ld.mold: /lib/crtn.o
+# # * /lib is a link to /usr/lib, therefore this is acceptable
 
 # Verify that stage2 rebuilt clang is searching for the correct header files:
 grep -B1 -A1 '^ /usr' dummy.log
@@ -110,21 +111,22 @@ grep -B1 -A1 '^ /usr' dummy.log
 #  /usr/lib/clang/19/include
 # End of search list.
 
-# Make sure no libraries are loaded from llvmtools
-grep ld:  dummy.log
-# It should output:
-# ld: /lib/Scrt1.o
-# ld: /lib/crti.o
-# ld: /usr/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
-# ld: /tmp/dummy-b69998.o
-# ld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# ld: /lib/libunwind.so
-# ld: /lib/libatomic.so
-# ld: /lib/libc.so
-# ld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# ld: /lib/libunwind.so
-# ld: /usr/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
-# ld: /lib/crtn.o
+# **Sadly, "ld.mold --verbose" outputs nothing**
+# # Make sure no libraries are loaded from llvmtools
+# grep ld.mold:  dummy.log
+# # It should output:
+# # ld.mold: /lib/Scrt1.o
+# # ld.mold: /lib/crti.o
+# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
+# # ld.mold: /tmp/dummy-b69998.o
+# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /lib/libunwind.so
+# # ld.mold: /lib/libatomic.so
+# # ld.mold: /lib/libc.so
+# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /lib/libunwind.so
+# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
+# # ld.mold: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
 cat > atomics-test.cpp << "EOF"
