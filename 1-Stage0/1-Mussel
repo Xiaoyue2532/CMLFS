@@ -13,14 +13,14 @@ cd mussel
 # Patch to Modify ./mussel.sh to change these:
 # MPREFIX="/cgnutools"
 # MSYSROOT="/cgnutools"
-patch -Np1 -i ../patches/mussel-change-variables.patch
+# patch -Np1 -i ../patches/mussel-change-variables.patch
 
 # Apply patch to add compatibility links for cross AR and RANLIB
 patch -Np1 -i ../patches/mussel-add-missing-symlinks.patch
 
 # If compiling with LLVM, prefix commands with LLVM=1 
 # to build kernel headers
-patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch
+# patch -Np1 -i ../patches/mussel-LLVM_for_headers.patch
 
 # Build toolchain. Amend PATH to include /cgnutools/bin
 # o Omit -p if not building in parallel to use all the host's CPU cores

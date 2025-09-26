@@ -3,14 +3,17 @@
 
 cmake \
     -B build \
-    -G "Ninja" -Wno-dev \
+    -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/llvmtools" \
-    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++"
+    -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-clang" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-clang++"
 
+# Compile
 cmake --build build
 
+# Install
 cmake --install build
 
-# Replace GNU ld.bfd with mold
+# Create symlink for mold as GNU ld
 ln -sv mold /llvmtools/bin/ld

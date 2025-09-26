@@ -11,7 +11,7 @@ Use at you own risk. This builds a Unix-like system that may not be stable enoug
 The master branch may be unstable when I am working on upgrading CMLFS. 
 
 To build this project, pick a branch other than master OR choose a tag. Each branch & tag are based on the LLVM version.
-As of this writing, llvm-15.0.6 is stable. Older branches maybe incomplete or unstable (may not compile).
+As of this writing, llvm-21.1.2 is stable. Older branches maybe incomplete or unstable (may not compile).
 
 When I have time later, I will write a more thorough introduction for users new to CMLFS.
 
@@ -20,22 +20,17 @@ When I have time later, I will write a more thorough introduction for users new 
 <li>C Runtime Library (system libc): Musl </li>
 <li>Default C Compiler: clang (LLVM)</li>
 <li>Default C++ compiler: clang++ (LLVM)</li>
-<li>Default linker: lld (LLVM)</li>
-<li>Default binary tools: elftoolchain</li>
-<li>Secondary C Compiler: GCC</li>
-<li>Secondary C++ compiler: GCC</li>
-<li>Secondary binary tools: GNU Binutils & LLVM</li>
-<li>Secondary linker(s): bfd, gold</li>
+<li>Default linker: mold</li>
+<li>Default binary tools: LLVM</li>
 <li>C++ standard library: libcxx (LLVM)</li>
 <li>C++ ABI library: libcxxabi (LLVM)</li>
 <li>Unwinding Library: libunwind (LLVM)</li>
 <li>Init system: skarnet's S6 & S6-rc</li>
 <li>Device manager: Udev </li>
-<li>TLS Implementaion: LibreSSL</li>
-<li>Secondary TLS Implementaion: OpenSSL</li>
-<li>System Shell: Bash </li>
-<li>System Gettext: gettext-tiny</li>
-<li>Curses Library: netbsd-curses </li>
+<li>TLS Implementaion: OpenSSL</li>
+<li>System Shell: Bash</li>
+<li>System Gettext: gettext (GNU)</li>
+<li>Curses Library: ncurses (GNU)</li>
 </ul>
 
 ## Supported Architectures
@@ -94,7 +89,7 @@ When I have time later, I will write a more thorough introduction for users new 
  <li>m4 1.4.10</li>
  <li>make 4.0 </li>
  <li>patch 2.5.4 </li>
- <li>Python 3.4 </li>
+ <li>Python 3.13 </li>
  <li>sed 4.1.5 </li>
  <li>tar 1.22 </li>
  <li>texinfo 4.7 </li>
@@ -127,6 +122,8 @@ Build 'cross-tools' with [Mussel](https://github.com/firasuke/mussel) to cross-c
 ## Change log
 
 <ul>
+<li>6.0.0: Upgraded to LLVM 21.1.2 </li>
+<li>5.0.0: Upgraded to LLVM 19.1.7 </li>
 <li>4.0.0: Upgraded to LLVM 17.0.5 </li>
 <li>3.0.0: Upgraded to LLVM-15.0.6. cgnutools is now bootstrapped with mussel. Replaced binutils with elftoolchain. Most of llvmtools will be build under chroot to avoid contamination from host. </li>
 <li>2.0.0: Upgraded to LLVM-12.0.0. Upgraded GCC to 10.3.1-x Replace ninja with samurai. Replace zlib with zlib-ng. Patched elfutils to build libelf under clang. No longer using /llvmtools/gnu and /opt/gnu.</li>

@@ -1,0 +1,35 @@
+# cgnutools: mold
+# Build and install as cmlfs
+
+# Built mold will need libstdc++.so.6 & libgcc_s.so.1.
+# Set the rpath
+export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib "
+export CXXFLAGS=$CFLAGS
+
+cmake \
+    -B build \
+    -G Ninja -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/cgnutools" \
+    -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-gcc" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++"
+
+# Compile
+cmake --build build
+
+# Install
+cmake --install build
+
+# Test mold coworking with stage0 gcc
+# Create a dummy C file and compile it with stage0 gcc using mold as the linker
+echo "int main() {}" > dummy.c
+/cgnutools/bin/x86_64-cmlfs-linux-musl-gcc -fuse-ld=mold \
+    dummy.c -v -Wl,--verbose &> dummy.log
+
+readelf -p .comment a.out | grep mold
+# Should output:
+# [     0]  mold 2.40.4 (compatible with GNU ld)
+
+# Clean up
+rm a.out dummy.c dummy.log
+unset CFLAGS CXXFLAGS

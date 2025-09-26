@@ -12,7 +12,7 @@ export CXXFLAGS=$CFLAGS
 
 cmake \
     -B build -S llvm \
-    -G "Ninja" -Wno-dev \
+    -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/llvmtools" \
     -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-clang" \
@@ -22,7 +22,7 @@ cmake \
     -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
     -DCLANG_BUILD_EXAMPLES=OFF \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_LINKER=mold \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCLANG_INCLUDE_TESTS=OFF \
@@ -105,9 +105,8 @@ ninja -C build # ............ 508 .......................... PASS
 # install to llvmtools
 cmake --install build --strip
 
-# Make LLD the default linker
-ln -sv clang-19 /llvmtools/bin/x86_64-cmlfs-linux-musl-clang
-ln -sv clang-19 /llvmtools/bin/x86_64-cmlfs-linux-musl-clang++
+ln -sv clang-21 /llvmtools/bin/x86_64-cmlfs-linux-musl-clang
+ln -sv clang-21 /llvmtools/bin/x86_64-cmlfs-linux-musl-clang++
 
 # Clear variables used in the CMake invocation:
 unset CFLAGS CXXFLAGS
@@ -135,22 +134,22 @@ grep -B1 -A2 '^ /llvmtools' dummy.log
 # It should output:
 # #include <...> search starts here:
 #  /llvmtools/usr/include
-#  /llvmtools/lib/clang/19/include
+#  /llvmtools/lib/clang/21/include
 # End of search list.
 
 # Make sure no libraries are loaded from the host or cgnutools
 grep ld:  dummy.log
 # ld: /llvmtools/lib/Scrt1.o
 # ld: /llvmtools/lib/crti.o
-# ld: /llvmtools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtbegin.o
+# ld: /llvmtools/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
 # ld: /tmp/dummy-35ed76.o
-# ld: /llvmtools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /llvmtools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld: /llvmtools/lib/libunwind.so
 # ld: /llvmtools/lib/libatomic.so
 # ld: /llvmtools/lib/libc.so
-# ld: /llvmtools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /llvmtools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld: /llvmtools/lib/libunwind.so
-# ld: /llvmtools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtend.o
+# ld: /llvmtools/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
 # ld: /llvmtools/lib/crtn.o
 
 # Check if stage1 clang++ [in llvmtools] has atomics.
@@ -179,7 +178,7 @@ grep -B2 -A2 '^ /llvmtools' atomics-test.log
 # #include <...> search starts here:
 #  /llvmtools/bin/../include/c++/v1
 #  /llvmtools/usr/include
-#  /llvmtools/lib/clang/19/include
+#  /llvmtools/lib/clang/21/include
 # End of search list.
 # NOTE: /llvmtools/include/c++/v1 should be searched first.
 
@@ -220,7 +219,7 @@ llvm-readelf -d /llvmtools/lib/libc++.so.1.0 | grep Shared | cut -b 37-
 llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 # Shared library: [libunwind.so.1]
-llvm-readelf -d /llvmtools/lib/libLLVM.so.19.1 | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libc++.so.1]
 # Shared library: [libc.so]

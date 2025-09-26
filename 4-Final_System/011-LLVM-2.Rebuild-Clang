@@ -13,9 +13,9 @@ cmake \
     -S llvm -B build \
     -G Ninja -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_PREFIX="/usr" \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_LINKER=mold \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCLANG_INCLUDE_TESTS=OFF \
@@ -64,7 +64,7 @@ export VBUILD=/sources/VBUILD
 mkdir $VBUILD
 mkdir -pv $VBUILD/CLANG/usr/{bin,lib,include,share}
 mkdir -pv $VBUILD/CLANG/usr/lib/cmake
-mkdir -pv $VBUILD/CLANG/usr/lib/clang/19
+mkdir -pv $VBUILD/CLANG/usr/lib/clang/21
 
 mv -v $BUILD/usr/bin/*clang* $VBUILD/CLANG/usr/bin/
 mv -v $BUILD/usr/bin/c-index-test $VBUILD/CLANG/usr/bin/
@@ -73,7 +73,7 @@ mv -v $BUILD/usr/bin/cc $VBUILD/CLANG/usr/bin/
 
 mv -v $BUILD/usr/include/clang $VBUILD/CLANG/usr/include/
 mv -v $BUILD/usr/include/clang-c $VBUILD/CLANG/usr/include/
-mv -v $BUILD/usr/lib/clang/19/include $VBUILD/CLANG/usr/lib/clang/19/
+mv -v $BUILD/usr/lib/clang/21/include $VBUILD/CLANG/usr/lib/clang/21/
 mv -v $BUILD/usr/lib/cmake/clang $VBUILD/CLANG/usr/lib/cmake/
 mv -v $BUILD/usr/lib/libclang*.a $VBUILD/CLANG/usr/lib/
 mv -v $BUILD/usr/lib/libclang*.so $VBUILD/CLANG/usr/lib/
@@ -115,15 +115,15 @@ grep ld:  dummy.log
 # It should output:
 # ld: /lib/Scrt1.o
 # ld: /lib/crti.o
-# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtbegin.o
+# ld: /usr/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
 # ld: /tmp/dummy-b69998.o
-# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld: /lib/libunwind.so
 # ld: /lib/libatomic.so
 # ld: /lib/libc.so
-# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld: /lib/libunwind.so
-# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtend.o
+# ld: /usr/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
 # ld: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
@@ -153,7 +153,7 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/19/include
+#  /usr/lib/clang/21/include
 # End of search list.
 
 # Test if stage1 clang supports C++11
