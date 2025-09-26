@@ -4,29 +4,19 @@
 # NOTE: Required by chimerautils-tiny
 
 # Apply patches from Chimera Linux
-# patch -Np1 -i ../patches/libxo-chimera/portability.patch
-# patch -Np1 -i ../patches/libxo-chimera/bmake.patch
-# patch -Np1 -i ../patches/libxo-chimera/gettext.patch
 find ../../cports/main/libxo/patches/ -type f -exec patch -Np1 -i {} \;
 
-# Generate the configure script
-sh bin/setup.sh
-
-# Configure source
-cd build
-
+# Configure
 CC=clang CXX=clang++ \
 LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
-../configure \
+./configure \
     --prefix=/llvmtools \
-    --exec-prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl \
+    --exec-prefix=/llvmtools \
     --with-gettext=/llvmtools
 
-# Compile
-make
-
-make install
+# Build and install to toolchain
+make -j`nproc --all` && make install

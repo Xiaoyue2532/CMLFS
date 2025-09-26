@@ -10,9 +10,8 @@ export CPPFLAGS="-I/llvmtools/include/ncursesw "
 CC=clang CXX=clang++ \
 LD=ld.mold \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
-    --build=x86_64-cmlfs-linux-musl \
-    --host=x86_64-cmlfs-linux-musl \
     --prefix=/llvmtools \
     --sysconfdir=/llvmtools/etc \
     --enable-color \

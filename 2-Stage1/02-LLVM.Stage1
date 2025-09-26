@@ -1,4 +1,4 @@
-# llvmtools: Stage1 clang (with compiler-rt, libcxx, libcxxabi, libunwind)
+# Stage1: LLVM (clang, compiler-rt, libcxx, libcxxabi, libunwind)
 # Build as cmlfs
 #
 # o Reuse llvm-project source tree from before
@@ -84,19 +84,6 @@ cmake \
 # compile
 cmake --build build
 
-# For troubleshooting, this is the breakdown of build targets:
-ninja -C build llvm-headers # 202 targets .................. PASS
-ninja -C build llvm-tblgen  #  68 .......................... PASS 
-ninja -C build llvm-lib # .. 1598 .......................... PASS 
-ninja -C build unwind # .... 1370 .......................... PASS 
-ninja -C build compiler-rt # .. 5 .......................... PASS
-ninja -C build builtins # ..... 3 .......................... PASS 
-ninja -C build cxxabi # .... 1051 .......................... PASS 
-ninja -C build cxx # ........ 103 .......................... PASS
-ninja -C build clang # ..................................... PASS 
-ninja -C build libclang # .... 31 .......................... PASS
-ninja -C build # ............ 508 .......................... PASS
-
 # install to llvmtools
 cmake --install build --strip
 
@@ -107,7 +94,7 @@ ln -sv clang-20 /llvmtools/bin/x86_64-cmlfs-linux-musl-clang++
 unset CFLAGS CXXFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
-export PATH=/llvmtools/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+export PATH="/llvmtools/bin:$PATH"
 
 # Test stage1 Clang
 echo "int main() {}" > dummy.c

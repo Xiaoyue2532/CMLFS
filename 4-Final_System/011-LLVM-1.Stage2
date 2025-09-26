@@ -93,25 +93,7 @@ cmake \
 cmake --build build
 
 # Missing inc file probably cause build failure
-cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/ExtractAPI
-
-# If build fails to compile, use below to see what component failed.
-# ninja -C build $TARGET
-# Build target break down (still unsure of order):
-# * Count is based on the x86_64-cmlfs-linux-musl target
-#
-# $TARGET ......... COUNT ........ STATUS
-# llvm-headers ...... 202 ......... PASS
-# llvm-tblgen ........ 68 ......... PASS 
-# llvm-lib ......... 1812 ......... PASS 
-# clang ............ 1181 ......... PASS 
-# builtins ........... 56 ......... PASS
-# cxxabi ........... 1067 ......... PASS 
-# cxx ............... 103 ......... PASS
-# compiler-rt ....... 582 ......... PASS 
-# libclang ........... 31 ......... PASS 
-# unwind .............. 5 ......... PASS
-# <remaining> ....... 530 ......... PASS 
+# cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/ExtractAPI
 
 # Install
 cmake --install build --strip

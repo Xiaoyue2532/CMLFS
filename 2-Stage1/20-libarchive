@@ -3,15 +3,18 @@
 # Required by elftoolchain
 
 # Apply patch to enable xz multithreaded compression by default.
-patch -Np1 -i ../../cports/main/libarchive/patches/filter-xz-enable-threads.patch
+# patch -Np1 -i ../../cports/main/libarchive/patches/filter-xz-enable-threads.patch
 
 # Configure source
 CC=clang CXX=clang++ \
 LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
+    --prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl \
-    --prefix=/llvmtools \
     PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
     --disable-static \
     --without-xml2 \

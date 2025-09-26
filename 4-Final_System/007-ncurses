@@ -1,14 +1,12 @@
 # Final System: netbsd-curses
 # Build and install under chroot
 
-# set symbol link
-ln -s llvm-strip /llvmtools/bin/strip
-
 # Build
-CC=clang  \
-CXX=clang++ \
-AR=llvm-ar \
-RANLIB=llvm-ranlib \
+CC=clang CXX=clang++ \
+LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/usr \
     --mandir=/usr/share/man \
@@ -19,16 +17,15 @@ RANLIB=llvm-ranlib \
     --enable-cmlfs-files \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
-make -j`nproc --all` && make install
+make -j`nproc --all`
 
+# Install
 make DESTDIR=$PWD/dest install
 install -vm755 dest/usr/lib/libncursesw.so.6.5 /usr/lib
 rm -v  dest/usr/lib/libncursesw.so.6.5
 sed -e 's/^#if.*XOPEN.*$/#if 1/' \
     -i dest/usr/include/curses.h
 cp -av dest/* /
-
-# Install
 
 # Some packages may not configure with the curses library.
 # Create a compatibility link:

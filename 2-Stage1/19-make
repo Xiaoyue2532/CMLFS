@@ -4,10 +4,13 @@
 # Configure source with clang
 CC=clang CXX=clang++ \
 LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
+    --prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl \
-    --prefix=/llvmtools \
     --without-guile
 
 # Build and install to toolchain

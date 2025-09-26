@@ -6,6 +6,8 @@ mkdir build
 pushd build
     CC=clang CXX=clang++ \
     LD=ld.mold \
+    AR=llvm-ar AS=llvm-as \
+    RANLIB=llvm-ranlib STRIP=llvm-strip \
     ../configure AWK=gawk
     make -C include -j`nproc --all`
     make -C progs tic -j`nproc --all`
@@ -14,10 +16,13 @@ popd
 # Build
 CC=clang CXX=clang++ \
 LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/llvmtools \
-    --host=x86_64-cmlfs-linux-musl \
     --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl \
     --with-shared \
     --without-normal \
     --with-cxx-shared \
@@ -35,8 +40,28 @@ sed -e 's/^#if.*XOPEN.*$/#if 1/' \
 
 # Some packages may not configure with the curses library
 # in llvmtools. Create a compatibility links:
-ln -sv libncurses.so  /llvmtools/lib/libtinfo.so
-ln -sv libncurses.so  /llvmtools/lib/libtinfow.so
+ln -sv libncurses.so /llvmtools/lib/libtinfo.so
+ln -sv libncurses.so /llvmtools/lib/libtinfow.so
 
 # fix python cannot find term.h
-ln -s ncursesw/term.h /llvmtools/include/term.h
+cd /llvmtools/include/ncursesw
+mv * ../
+
+ln -s ../curses.h
+ln -s ../cursesapp.h
+ln -s ../cursesf.h
+ln -s ../cursesm.h
+ln -s ../cursesp.h
+ln -s ../cursesw.h
+ln -s ../cursslk.h
+ln -s ../eti.h
+ln -s ../etip.h
+ln -s ../form.h
+ln -s ../menu.h
+ln -s ../ncurses.h
+ln -s ../ncurses_dll.h
+ln -s ../panel.h
+ln -s ../term.h
+ln -s ../term_entry.h
+ln -s ../termcap.h
+ln -s ../unctrl.h

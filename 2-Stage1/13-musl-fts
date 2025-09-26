@@ -7,7 +7,7 @@
 CC=clang   \
 AR=llvm-ar \
 PREFIX=/llvmtools \
-make
+make -j`nproc --all`
 
 # Install to llvmtools
 CC=clang   \

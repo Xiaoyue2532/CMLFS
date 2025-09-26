@@ -21,14 +21,7 @@ RANLIB=llvm-ranlib STRIP=llvm-strip \
     --no-system-libuv \
     --parallel=`nproc --all` \
     -- \
-    -DCMAKE_USE_OPENSSL=OFF \
-    -DBUILD_CursesDialog=ON \
-    -DCURSES_CURSES_LIBRARY=/llvmtools/lib/libcursesw.so \
-    -DCURSES_EXTRA_LIBRARY=/llvmtools/lib/libtinfow.so \
-    -DCURSES_FORM_LIBRARY=/llvmtools/lib/libformw.so \
-    -DCURSES_INCLUDE_PATH=/llvmtools/include/ncursesw \
-    -DCURSES_NCURSES_LIBRARY=/llvmtools/lib/libncursesw.so
-
+    -DBUILD_CursesDialog=ON
 
 # Build and install to toolchain
 make -j`nproc --all` && make install

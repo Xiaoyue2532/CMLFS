@@ -7,5 +7,3 @@ for h in cdefs queue tree
 do
     install -v -D -m644 src/$h.h /llvmtools/include/sys
 done
-
-#install -v -D -m644 src/error.h /llvmtools/include/

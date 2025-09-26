@@ -2,7 +2,7 @@
 # Build & install under chroot
 
 # Build
-CC=$CC make PREFIX=/usr
+CC=clang make PREFIX=/usr
 
 # Install
-CC=$CC make PREFIX=/usr install
+CC=clang make PREFIX=/usr install

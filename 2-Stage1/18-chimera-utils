@@ -12,18 +12,17 @@
 patch -Np1 -i ../patches/chimerautils-cmlfs/libressl-evp-noblake2b512-support.patch
 
 CC=clang CXX=clang++ \
-AR=llvm-ar \
-AS=llvm-as \
+LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
 meson \
     --prefix=/llvmtools \
-    --sbindir=bin \
     --pkg-config-path /llvmtools/lib/pkgconfig \
-    -Dstatic_fts=true \
-    -Dstatic_rpmatch=true \
     -Dcolor_ls=true \
-    -Dlibcrypto=enabled \
-    -Dlibedit=enabled build
+    -Dopenssl=enabled \
+    -Dlibedit=disabled \
+    -Dzstd=disabled \
+    build
 
 # compile
 ninja -C build

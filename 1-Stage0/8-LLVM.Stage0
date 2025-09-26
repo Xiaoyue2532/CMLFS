@@ -104,19 +104,6 @@ cmake \
 # compile
 cmake --build build
 
-# For troubleshooting, this is the breakdown of build targets:
-# Note: Order from least to most deps not acertained yet.
-ninja -C build clang # ............................................. PASS
-ninja -C build llvm-tblgen # ....................................... PASS
-ninja -C build llvm-lib # 1868 targets ............................. PASS
-ninja -C build cxxabi # 1370 targets ............................... PASS
-ninja -C build cxx # 105 targets ................................... PASS
-ninja -C build libclang # 31 targets ............................... PASS
-ninja -C build compiler-rt # 5 targets ............................. PASS
-ninja -C build unwind # 5 targets .................................. PASS
-ninja -C build builtins # 3 targets ................................ PASS
-ninja -C build # 570 ............................................... PASS
-
 # install to cgnutools
 cmake --install build --strip
 

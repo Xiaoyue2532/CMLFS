@@ -1,16 +1,22 @@
 # Stage1: Gettext
 # Build and install as cmlfs
+# use GNU gettext
 
 # Build with clang
 CC=clang CXX=clang++ \
+LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
+OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
+    --prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \
-    --host=x86_64-cmlfs-linux-musl \
-    --prefix=/llvmtools
+    --host=x86_64-cmlfs-linux-musl
 
 make -j`nproc --all` && make install
 
 # Install the msgfmt, msgmerge and xgettext programs to toolchain
-cp -v autopoint msgfmt msgmerge xgettext /llvmtools/bin
+cp -v \
+    ./gettext-tools/src/msgfmt \
+    ./gettext-tools/src/msgmerge \
+    ./gettext-tools/src/xgettext /llvmtools/bin

@@ -1,8 +1,11 @@
 # llvmtools: OpenSSL
 # Build & install under chroot
 
-# Configure source to install in /opt/openssl
+# Configure
 CC=clang CXX=clang++ \
+LD=ld.mold \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./config \
     --prefix=/llvmtools \
     --openssldir=/llvmtools/etc/ssl \
@@ -12,8 +15,5 @@ CC=clang CXX=clang++ \
     enable-ktls \
     -Wa,--noexecstack
 
-# Compile
-make -j`nproc --all`
-
-# Install to /opt
-make install
+# Compile and install
+make -j`nproc --all` && make install

@@ -1,10 +1,9 @@
-# Stage 1: Gawk
-# Build and install as cmlfs
+# Final System: acl 
+# This section is done in Chroot environment
 
-# Configure source with clang
+# Configure source
 CC=clang CXX=clang++ \
 LD=ld.mold \
-AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
@@ -12,5 +11,5 @@ OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl
 
-# Build and install to toolchain
+# Build and install
 make -j`nproc --all` && make install
