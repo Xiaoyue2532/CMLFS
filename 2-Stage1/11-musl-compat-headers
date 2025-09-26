@@ -1,9 +1,0 @@
-# llvmtools: Musl Legacy Compatibility Headers
-# Build as cmlfs
-#
-# NOTE: Required by libxo
-
-for h in cdefs queue tree
-do
-    install -v -D -m644 src/$h.h /llvmtools/include/sys
-done

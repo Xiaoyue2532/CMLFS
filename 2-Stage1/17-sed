@@ -1,0 +1,8 @@
+# Stage1: Sed 
+# Build by cmlfs
+
+CC=clang CXX=clang++ \
+./configure \
+    --prefix=/llvmtools
+
+make -j`nproc --all` && make install
