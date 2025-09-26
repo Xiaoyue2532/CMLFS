@@ -6,7 +6,7 @@
 # o Use the monorepo source, i.e llvm-project-x.x.x.tar.xz
 
 # Source tree will be reused later. Apply patches from Chimera Linux
-find ../cports/main/llvm/patches/ -type f -exec patch -Np1 -i {} \;
+find ../../cports/main/llvm/patches/ -type f -exec patch -Np1 -i {} \;
 
 # Musl doesn't support strtoll_l(), so replace it with a simple strtoll() call.
 # Apply patches to allow localization of libc++:
@@ -16,7 +16,7 @@ find ../cports/main/llvm/patches/ -type f -exec patch -Np1 -i {} \;
 # patch -Np1 -i ../patches/llvm1506-cmlfs/remove-locale-inlines.patch
 
 # gcc dont have nostdinc(LLVM 19.1.7 and 20.1.8 need this patch, 21.1.2 do not)
-# patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdinc-with-the-C-.patch
+patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdinc-with-the-C-.patch
 
 # Since, libunwind is for cgnutools, modify the cross-gcc specs to set the dynamic
 # loader as  /cgnutools/lib/ld-musl-${MCA}.so.1

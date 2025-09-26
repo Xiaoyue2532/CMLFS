@@ -10,8 +10,18 @@
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.llvmtools.patch
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch
 
+# /home/ubuntu/sources/llvm-project-20.1.8.src/compiler-rt/lib/builtins/../../../libunwind/include/unwind.h:16:10: error: '__libunwind_config.h' file not found with <angled> include; use "quotes" instead
+#    16 | #include <__libunwind_config.h>
+#       |          ^~~~~~~~~~~~~~~~~~~~~~
+#       |          "__libunwind_config.h"
+# /home/ubuntu/sources/llvm-project-20.1.8.src/compiler-rt/lib/builtins/../../../libunwind/include/unwind.h:61:10: error: 'unwind_itanium.h' file not found with <angled> include; use "quotes" instead
+#    61 | #include <unwind_itanium.h>
+#       |          ^~~~~~~~~~~~~~~~~~
+#       |          "unwind_itanium.h"
+
 # Built llvm-tblgen will need libstdc++.so.6 & libgcc_s.so.1.
 # Set the rpath
+# export CFLAGS="-Wl,-rpath=/cgnutools/lib"
 export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
 export CXXFLAGS=$CFLAGS
 
@@ -21,7 +31,9 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/cgnutools" \
     -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-gcc" \
+    -DCMAKE_C_COMPILER_LAUNCHER=sccache \
     -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++" \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
     -DCMAKE_AR="/cgnutools/bin/x86_64-cmlfs-linux-musl-ar" \
     -DCMAKE_NM="/cgnutools/bin/x86_64-cmlfs-linux-musl-nm" \
     -DCMAKE_RANLIB="/cgnutools/bin/x86_64-cmlfs-linux-musl-ranlib" \
@@ -37,6 +49,7 @@ cmake \
     -DCOMPILER_RT_BUILD_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
@@ -64,7 +77,6 @@ cmake \
     -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_UTILS=OFF \
-    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBEDIT=OFF \
@@ -84,13 +96,10 @@ cmake \
     -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
-    -DLLVM_TARGET_ARCH="host" \
-    -DLLVM_USE_LINKER=mold
+    -DLLVM_TARGET_ARCH="host"
 
-# -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
-# Must not use -DLLVM_USE_LLD=ON or  or runtime build would fail
-# probably because we do not have compiler-rt in this stage
-cp -r ../build-rt/_install/clang ./lib/
+# Must not use -DLLVM_USE_LLD=ON or -DLLVM_USE_LINKER=mold 
+# otherwise runtime build would fail
 
 # compile
 cmake --build build
@@ -111,8 +120,8 @@ ninja -C build # 570 ............................................... PASS
 # install to cgnutools
 cmake --install build --strip
 
-ln -sv clang-21 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang
-ln -sv clang-21 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang++
+ln -sv clang-20 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang
+ln -sv clang-20 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang++
 
 # Disable cross libgcc ... we will use stage0 clang instead
 mv -v /cgnutools/lib/gcc{,-disabled}
@@ -132,7 +141,7 @@ echo "/cgnutools/lib" >> /llvmtools/etc/ld-musl-x86_64.path
 # Test stage0 Clang
 echo "int main() {}" > dummy.c
 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang \
-    dummy.c -v -Wl,--verbose &> dummy.log
+    dummy.c -v &> dummy.log
 llvm-readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
@@ -142,7 +151,7 @@ grep -B2 -A1 '^ /llvmtools/usr/include' dummy.log
 # It should output in this order:
 # /cgnutools/include/c++/v1
 # /llvmtools/usr/include
-# /cgnutools/lib/clang/21/include
+# /cgnutools/lib/clang/20/include
 # NOTE: The libc++ headers should be searched first before any other header directories.
 
 # Check if stage0 clang++ [in llvmtools] has atomics.
@@ -159,7 +168,7 @@ int main() {
 EOF
 
 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang++ \
-    atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
+    atomics-test.cpp -v &> atomics-test.log
 
 # Check for errors during compile or link:
 grep error:  atomics-test.log
@@ -183,7 +192,7 @@ int main(){
 EOF
 
 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang++ \
-    cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+    cxx11-test.cpp -v &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log

@@ -7,7 +7,8 @@ export LDFLAGS="-L/llvmtools/lib -lncursesw "
 export CPPFLAGS="-I/llvmtools/include/ncursesw "
 
 # Configure source with clang
-CC=clang RANLIB=llvm-ranlib STRIP=llvm-strip \
+CC=clang CXX=clang++ \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl \

@@ -1,5 +1,5 @@
-CC=clang \
-ld
+CC=clang CXX=clang++ \
+LD=ld.mold \
 ./configure \
     --prefix=/llvmtools \
     --libdir=/llvmtools/lib/libfakeroot \

@@ -17,7 +17,7 @@ chmod -v +x /llvmtools/bin/lsb_release
 cat > /llvmtools/etc/lsb-release << "EOF"
 DISTRIB_ID="llvmtools"
 DISTRIB_RELEASE="6.0.0_amd64"
-DISTRIB_CODENAME="21-elftool-tools"
+DISTRIB_CODENAME="20-elftool-tools"
 DISTRIB_DESCRIPTION="Clang-built Musl Toolchain for CMLFS, AMD64"
 EOF
 
@@ -27,5 +27,5 @@ NAME="llvmtools"
 VERSION="6.0.0_amd64"
 ID=llvmtools
 PRETTY_NAME="Clang-built Musl Toolchain for CMLFS, AMD64"
-VERSION_CODENAME="21-elftool-tools"
+VERSION_CODENAME="20-elftool-tools"
 EOF

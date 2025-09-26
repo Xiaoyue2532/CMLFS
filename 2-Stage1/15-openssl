@@ -1,4 +1,4 @@
-# Final System: OpenSSL
+# llvmtools: OpenSSL
 # Build & install under chroot
 
 # Configure source to install in /opt/openssl

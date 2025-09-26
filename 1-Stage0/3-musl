@@ -4,13 +4,6 @@
 # binaries built by the stage0 gcc would rely on /llvmtools/lib/ld-musl-x86_64.so.1
 # so musl has to be built and installed in /llvmtools
 
-# Stage1 clang expects headers in /llvmtools/usr/include
-# May need a patch clang source to change that...
-# o clang/lib/Driver/ToolChains/Linux.cpp
-# o clang/lib/Driver/ToolChains/Gnu.cpp
-# For now, create a link.
-ln -sv . /llvmtools/usr
-
 # Configure with freshly built GCC
 ./configure \
     CROSS_COMPILE=x86_64-cmlfs-linux-musl- \

@@ -33,6 +33,7 @@ cmake \
     -DCLANG_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
     -DCOMPILER_RT_CXX_LIBRARY=libcxx \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
@@ -80,8 +81,6 @@ cmake \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
-    -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
-    -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
     -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
@@ -89,6 +88,9 @@ cmake \
     -DZLIB_INCLUDE_DIR="/usr/include" \
     -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so" \
     ../llvm
+
+# -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
+# -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
 
 # compile (~ 4,048 targets)
 cmake --build build
@@ -117,14 +119,14 @@ cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/Extr
 # Install
 cmake --install build --strip
 
-ln -sv clang-21 /usr/bin/x86_64-cmlfs-linux-musl-clang
-ln -sv clang-21 /usr/bin/x86_64-cmlfs-linux-musl-clang++
+ln -sv clang-20 /usr/bin/x86_64-cmlfs-linux-musl-clang
+ln -sv clang-20 /usr/bin/x86_64-cmlfs-linux-musl-clang++
 
 # cp -v ./clang/include/clang/ExtractAPI/APIRecords.inc /usr/include/clang/ExtractAPI
 # rm -rv /usr/bin/python3
 
 # Fix the dynamic linker for the executables:
-for b in bugpoint c-index-test clang-21 count diagtool dsymutil FileCheck \
+for b in bugpoint c-index-test clang-20 count diagtool dsymutil FileCheck \
     llc lli lli-child-target not obj2yaml opt sancov sanstats \
     split-file UnicodeNameMappingGenerator verify-uselistorder yaml2obj \
     yaml-bench amdgpu-arch nvptx-arch
@@ -166,7 +168,7 @@ ln -sfv ld /usr/bin/ld
 # Test stage2 Clang
 echo "int main() {}" > dummy.c
 /usr/bin/x86_64-cmlfs-linux-musl-clang \
-    dummy.c -v -Wl,--verbose &> dummy.log
+    dummy.c -v &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
 # Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
@@ -177,7 +179,7 @@ grep -B1 -A1 '^ /usr' dummy.log
 # #include <...> search starts here:
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/21/include
+#  /usr/lib/clang/20/include
 # End of search list.
 
 # Check if stage2 clang++ supports atomics.
@@ -194,7 +196,7 @@ int main() {
 EOF
 
 /usr/bin/x86_64-cmlfs-linux-musl-clang++ \
-    atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
+    atomics-test.cpp -v &> atomics-test.log
 
 # Check for errors during compile or link:
 grep error:  atomics-test.log
@@ -207,7 +209,7 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/21/include
+#  /usr/lib/clang/20/include
 # It should be in this order
 
 # Test if stage1 clang supports C++11
@@ -228,7 +230,7 @@ int main() {
 EOF
 
 /usr/bin/x86_64-cmlfs-linux-musl-clang++ \
-    cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+    cxx11-test.cpp -v &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log
@@ -244,7 +246,7 @@ llvm-readelf -d /usr/lib/libc++.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 llvm-readelf -d /usr/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /usr/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
+llvm-readelf -d /usr/lib/libLLVM.so.20.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libzstd.so.1]
 # Shared library: [libterminfo.so]
@@ -260,10 +262,10 @@ export CC=clang CXX=clang++
 
 # # Many packages use the name cc to call the C compiler. To
 # # satisfy those packages, create a symlink
-# ln -sv clang-21 /usr/bin/cc
+# ln -sv clang-20 /usr/bin/cc
 
 # Create a symlink required by the FHS for "historical" reasons
-ln -sv ../bin/clang-21 /usr/lib/cpp
+ln -sv ../bin/clang-20 /usr/lib/cpp
 
 # fix posixtz need c99
 cp ../../cports/main/llvm/files/c99 /usr/bin/c99

@@ -4,11 +4,12 @@
 # and final system. 
 
 # Configure source
-CC=clang RANLIB=llvm-ranlib STRIP=llvm-strip \
+CC=clang CXX=clang++ \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
     --build=x86_64-cmlfs-linux-musl \
-    --host=x86_64-cmlfs-linux-musl  \
-    --prefix=/llvmtools      \
+    --host=x86_64-cmlfs-linux-musl \
+    --prefix=/llvmtools \
     --disable-libseccomp
 
 # Build and install to toolchain

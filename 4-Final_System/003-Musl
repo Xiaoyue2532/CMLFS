@@ -26,7 +26,7 @@ patch -Np1 -i ../../cports/main/musl/patches/default-locpath.patch
 
 # Configure
 CC=clang \
-ld
+LD=ld.mold \
 LIBCC=`clang -print-libgcc-file-name` \
 ./configure \
     --prefix=/usr \

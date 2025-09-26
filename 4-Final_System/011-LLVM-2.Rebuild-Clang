@@ -64,7 +64,7 @@ export VBUILD=/sources/VBUILD
 mkdir $VBUILD
 mkdir -pv $VBUILD/CLANG/usr/{bin,lib,include,share}
 mkdir -pv $VBUILD/CLANG/usr/lib/cmake
-mkdir -pv $VBUILD/CLANG/usr/lib/clang/21
+mkdir -pv $VBUILD/CLANG/usr/lib/clang/20
 
 mv -v $BUILD/usr/bin/*clang* $VBUILD/CLANG/usr/bin/
 mv -v $BUILD/usr/bin/c-index-test $VBUILD/CLANG/usr/bin/
@@ -73,7 +73,7 @@ mv -v $BUILD/usr/bin/cc $VBUILD/CLANG/usr/bin/
 
 mv -v $BUILD/usr/include/clang $VBUILD/CLANG/usr/include/
 mv -v $BUILD/usr/include/clang-c $VBUILD/CLANG/usr/include/
-mv -v $BUILD/usr/lib/clang/21/include $VBUILD/CLANG/usr/lib/clang/21/
+mv -v $BUILD/usr/lib/clang/20/include $VBUILD/CLANG/usr/lib/clang/20/
 mv -v $BUILD/usr/lib/cmake/clang $VBUILD/CLANG/usr/lib/cmake/
 mv -v $BUILD/usr/lib/libclang*.a $VBUILD/CLANG/usr/lib/
 mv -v $BUILD/usr/lib/libclang*.so $VBUILD/CLANG/usr/lib/
@@ -88,7 +88,7 @@ cp -ar CLANG/* /
 
 # Test Rebuilt Clang
 echo "int main(){}" > dummy.c
-/usr/bin/clang dummy.c -v -Wl,--verbose &> dummy.log
+/usr/bin/clang dummy.c -v &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
 # Shoud output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
@@ -117,15 +117,15 @@ grep -B1 -A1 '^ /usr' dummy.log
 # # It should output:
 # # ld.mold: /lib/Scrt1.o
 # # ld.mold: /lib/crti.o
-# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
+# # ld.mold: /usr/lib/clang/20/lib/linux/clang_rt.crtbegin-x86_64.o
 # # ld.mold: /tmp/dummy-b69998.o
-# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /usr/lib/clang/20/lib/linux/libclang_rt.builtins-x86_64.a
 # # ld.mold: /lib/libunwind.so
 # # ld.mold: /lib/libatomic.so
 # # ld.mold: /lib/libc.so
-# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
+# # ld.mold: /usr/lib/clang/20/lib/linux/libclang_rt.builtins-x86_64.a
 # # ld.mold: /lib/libunwind.so
-# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
+# # ld.mold: /usr/lib/clang/20/lib/linux/clang_rt.crtend-x86_64.o
 # # ld.mold: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
@@ -142,7 +142,7 @@ int main() {
 EOF
 
 /usr/bin/clang++ \
-atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
+atomics-test.cpp -v &> atomics-test.log
 
 # Check for errors during compile or link:
 grep error:  atomics-test.log
@@ -155,7 +155,7 @@ grep -B4 -A1 '^ /usr/lib' atomics-test.log
 #  /usr/bin/../include/c++/v1
 #  /usr/local/include
 #  /usr/include
-#  /usr/lib/clang/21/include
+#  /usr/lib/clang/20/include
 # End of search list.
 
 # Test if stage1 clang supports C++11
@@ -175,7 +175,7 @@ int main(){
 }
 EOF
 
-/usr/bin/clang++ cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
+/usr/bin/clang++ cxx11-test.cpp -v &> cxx11-test.log
 
 # Check for errors during compile or link:
 grep error: cxx11-test.log

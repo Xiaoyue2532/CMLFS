@@ -1,3 +1,10 @@
+# https://mirrors.cernet.edu.cn/gnu/coreutils/coreutils-9.7.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/diffutils/diffutils-3.12.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/findutils/findutils-4.10.0.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/gzip/gzip-1.14.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/m4/m4-1.4.20.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/patch/patch-2.8.tar.xz
+# https://mirrors.cernet.edu.cn/gnu/sed/sed-4.9.tar.xz
 https://astron.com/pub/file/file-5.46.tar.gz
 https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz
 https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz
@@ -24,6 +31,7 @@ https://github.com/libarchive/libarchive/releases/download/v3.8.1/libarchive-3.8
 https://github.com/libcheck/check/releases/download/0.15.2/check-0.15.2.tar.gz
 https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz
 https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz
+https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.8/llvm-project-20.1.8.src.tar.xz
 https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz
 https://github.com/mesonbuild/meson/releases/download/1.9.1/meson-1.9.1.tar.gz
 https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz
@@ -40,9 +48,6 @@ https://mirrors.cernet.edu.cn/gnu/autoconf/autoconf-2.72.tar.xz
 https://mirrors.cernet.edu.cn/gnu/automake/automake-1.18.1.tar.xz
 https://mirrors.cernet.edu.cn/gnu/bash/bash-5.3.tar.gz
 https://mirrors.cernet.edu.cn/gnu/bison/bison-3.8.2.tar.xz
-https://mirrors.cernet.edu.cn/gnu/coreutils/coreutils-9.7.tar.xz
-https://mirrors.cernet.edu.cn/gnu/diffutils/diffutils-3.12.tar.xz
-https://mirrors.cernet.edu.cn/gnu/findutils/findutils-4.10.0.tar.xz
 https://mirrors.cernet.edu.cn/gnu/gawk/gawk-5.3.2.tar.xz
 https://mirrors.cernet.edu.cn/gnu/gdbm/gdbm-1.26.tar.gz
 https://mirrors.cernet.edu.cn/gnu/gettext/gettext-0.26.tar.xz
@@ -50,15 +55,11 @@ https://mirrors.cernet.edu.cn/gnu/gperf/gperf-3.3.tar.gz
 https://mirrors.cernet.edu.cn/gnu/grep/grep-3.12.tar.xz
 https://mirrors.cernet.edu.cn/gnu/groff/groff-1.23.0.tar.gz
 https://mirrors.cernet.edu.cn/gnu/grub/grub-2.12.tar.xz
-https://mirrors.cernet.edu.cn/gnu/gzip/gzip-1.14.tar.xz
 https://mirrors.cernet.edu.cn/gnu/inetutils/inetutils-2.6.tar.xz
 https://mirrors.cernet.edu.cn/gnu/less/less-679.tar.gz
-https://mirrors.cernet.edu.cn/gnu/m4/m4-1.4.20.tar.xz
 https://mirrors.cernet.edu.cn/gnu/make/make-4.4.1.tar.gz
 https://mirrors.cernet.edu.cn/gnu/nano/nano-8.6.tar.xz
-https://mirrors.cernet.edu.cn/gnu/patch/patch-2.8.tar.xz
 https://mirrors.cernet.edu.cn/gnu/readline/readline-8.3.tar.gz
-https://mirrors.cernet.edu.cn/gnu/sed/sed-4.9.tar.xz
 https://mirrors.cernet.edu.cn/gnu/tar/tar-1.35.tar.xz
 https://mirrors.cernet.edu.cn/gnu/texinfo/texinfo-7.2.tar.xz
 https://mirrors.cernet.edu.cn/gnu/which/which-2.23.tar.gz
@@ -69,7 +70,6 @@ https://mirrors.cernet.edu.cn/kernel.org/linux/utils/kernel/kmod/kmod-34.2.tar.x
 https://mirrors.cernet.edu.cn/kernel.org/linux/utils/net/iproute2/iproute2-6.16.0.tar.xz
 https://mirrors.cernet.edu.cn/kernel.org/linux/utils/util-linux/v2.41/util-linux-2.41.1.tar.xz
 https://mirrors.cernet.edu.cn/ubuntu/pool/main/f/fakeroot/fakeroot_1.37.1.orig.tar.gz
-https://mirrors.tuna.tsinghua.edu.cn/github-release/llvm/llvm-project/LatestRelease/llvm-project-21.1.2.src.tar.xz
 https://pypi.org/packages/source/J/Jinja2/jinja2-3.1.6.tar.gz
 https://pypi.org/packages/source/M/MarkupSafe/markupsafe-3.0.2.tar.gz
 https://pypi.org/packages/source/f/flit-core/flit_core-3.12.0.tar.gz
@@ -90,3 +90,6 @@ https://sourceware.org/ftp/elfutils/0.193/elfutils-0.193.tar.bz2
 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
 https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz
 https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tgz
+https://github.com/chimera-linux/musl-rpmatch/archive/refs/tags/v1.0-mk2.tar.gz
+https://github.com/chimera-linux/chimerautils/archive/refs/tags/v14.3.1.tar.gz
+https://github.com/Juniper/libxo/releases/download/1.7.5/libxo-1.7.5.tar.gz

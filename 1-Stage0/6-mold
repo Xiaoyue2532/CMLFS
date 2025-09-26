@@ -24,7 +24,7 @@ cmake --install build
 # Create a dummy C file and compile it with stage0 gcc using mold as the linker
 echo "int main() {}" > dummy.c
 /cgnutools/bin/x86_64-cmlfs-linux-musl-gcc -fuse-ld=mold \
-    dummy.c -v -Wl,--verbose &> dummy.log
+    dummy.c -v &> dummy.log
 
 readelf -p .comment a.out | grep mold
 # Should output:

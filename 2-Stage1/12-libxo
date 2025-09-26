@@ -1,0 +1,34 @@
+# llvmtools: libxo
+# Build as cmlfs
+#
+# NOTE: Required by chimerautils-tiny
+
+# Apply patches from Chimera Linux
+# patch -Np1 -i ../patches/libxo-chimera/portability.patch
+# patch -Np1 -i ../patches/libxo-chimera/bmake.patch
+# patch -Np1 -i ../patches/libxo-chimera/gettext.patch
+find ../../cports/main/libxo/patches/ -type f -exec patch -Np1 -i {} \;
+
+# Generate the configure script
+sh bin/setup.sh
+
+# Configure source
+cd build
+
+CC=clang CXX=clang++ \
+AR=llvm-ar \
+AS=llvm-as \
+RANLIB=llvm-ranlib \
+LD=ld.lld \
+STRIP=llvm-strip \
+../configure \
+    --prefix=/llvmtools \
+    --exec-prefix=/llvmtools \
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl \
+    --with-gettext=/llvmtools
+
+# Compile
+make
+
+make install

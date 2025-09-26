@@ -3,9 +3,9 @@
 
 # Configure source with clang
 CC=clang CXX=clang++ \
+LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib \
-ld
 STRIP=llvm-strip \
 ./bootstrap \
     --prefix=/llvmtools \
