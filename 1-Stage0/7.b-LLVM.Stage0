@@ -10,15 +10,6 @@
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.llvmtools.patch
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch
 
-# Restore -nostdlibc changes
-# clang we use in the following stages support stdinc
-# revert patch
-# patch -Np1 -R -i ../../CMLFS/patches/llvm-cmlfs/runtimes-Probe-for-nostdlib-and-nostdinc-with-the-C-.patch
-
-# LLVM-19.1.7 needs to modify these: 
-# - libunwind/include/unwind.h: <__libunwind_config.h> -> "__libunwind_config.h"
-# - libunwind/include/unwind.h: <unwind_itanium.h> -> "unwind_itanium.h"
-
 # Built llvm-tblgen will need libstdc++.so.6 & libgcc_s.so.1.
 # Set the rpath
 export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
@@ -99,7 +90,6 @@ cmake \
 # -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
 # Must not use -DLLVM_USE_LLD=ON or  or runtime build would fail
 # probably because we do not have compiler-rt in this stage
-# mold or lld would be useful in the following stages, but not this one
 cp -r ../build-rt/_install/clang ./lib/
 
 # compile
@@ -146,31 +136,6 @@ echo "int main() {}" > dummy.c
 llvm-readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
-
-# **Sadly, "ld.mold --verbose" outputs nothing**
-# # Check if the correct start files are used
-# grep  'crt[1in]' dummy.log | grep ld.mold:
-# # Should output:
-# # ld.mold: /llvmtools/lib/Scrt1.o
-# # ld.mold: /llvmtools/lib/crti.o
-# # ld.mold: /llvmtools/lib/crtn.o
-
-# **Sadly, "ld.mold --verbose" outputs nothing**
-# # Make sure no libraries are loaded from the host
-# grep ld.mold:  dummy.log
-# # Should output:
-# # ld.mold: /llvmtools/lib/Scrt1.o
-# # ld.mold: /llvmtools/lib/crti.o
-# # ld.mold: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
-# # ld.mold: /tmp/dummy-ffb57c.o
-# # ld.mold: /mnt/cmlfs/cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# # ld.mold: /llvmtools/lib/libunwind.so
-# # ld.mold: /llvmtools/lib/libatomic.so
-# # ld.mold: /llvmtools/lib/libc.so
-# # ld.mold: /cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# # ld.mold: /llvmtools/lib/libunwind.so
-# # ld.mold: /cgnutools/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
-# # ld.mold: /llvmtools/lib/crtn.o
 
 # Verify that stage0 clang is searching for the correct header files:
 grep -B2 -A1 '^ /llvmtools/usr/include' dummy.log

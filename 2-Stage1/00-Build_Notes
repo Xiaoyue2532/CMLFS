@@ -17,7 +17,7 @@
 #    - libc++abi
 #    - libc++
 #    - compiler-rt
-#    - lld
+#    - mold
 #    - clang
 
 # Since stage0 clang is now built, it will build stage1 clang with out any

@@ -105,7 +105,6 @@ cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/Extr
 # llvm-headers ...... 202 ......... PASS
 # llvm-tblgen ........ 68 ......... PASS 
 # llvm-lib ......... 1812 ......... PASS 
-# lld ............... 126 ......... PASS 
 # clang ............ 1181 ......... PASS 
 # builtins ........... 56 ......... PASS
 # cxxabi ........... 1067 ......... PASS 
@@ -126,7 +125,7 @@ ln -sv clang-21 /usr/bin/x86_64-cmlfs-linux-musl-clang++
 
 # Fix the dynamic linker for the executables:
 for b in bugpoint c-index-test clang-21 count diagtool dsymutil FileCheck \
-    llc lld lli lli-child-target not obj2yaml opt sancov sanstats \
+    llc lli lli-child-target not obj2yaml opt sancov sanstats \
     split-file UnicodeNameMappingGenerator verify-uselistorder yaml2obj \
     yaml-bench amdgpu-arch nvptx-arch
 do
@@ -172,16 +171,6 @@ llvm-readelf -l a.out | grep ': /lib'
 # Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
 
-# **Sadly, "ld.mold --verbose" outputs nothing**
-# # Check if the correct start files are used
-# grep  'crt[1in]' dummy.log | grep ld.mold:
-# # Should output:
-# # ld.mold: /lib/Scrt1.o
-# # ld.mold: /lib/crti.o
-# # ld.mold: /lib/crtn.o
-# # * /lib is a link to /usr/lib, therefore this is acceptable
-# # * ld is a link to ld, therefore this is acceptable
-
 # Verify that stage2 clang is searching for the correct header files:
 grep -B1 -A1 '^ /usr' dummy.log
 # It should output:
@@ -190,22 +179,6 @@ grep -B1 -A1 '^ /usr' dummy.log
 #  /usr/include
 #  /usr/lib/clang/21/include
 # End of search list.
-
-# **Sadly, "ld.mold --verbose" outputs nothing**
-# # Make sure no libraries are loaded from llvmtools
-# grep ld.mold:  dummy.log
-# # ld.mold: /lib/Scrt1.o
-# # ld.mold: /lib/crti.o
-# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
-# # ld.mold: /tmp/dummy-1f0e32.o
-# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# # ld.mold: /lib/libunwind.so
-# # ld.mold: /lib/libatomic.so
-# # ld.mold: /lib/libc.so
-# # ld.mold: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
-# # ld.mold: /lib/libunwind.so
-# # ld.mold: /usr/lib/clang/21/lib/linux/clang_rt.crtend-x86_64.o
-# # ld.mold: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
 cat > atomics-test.cpp << "EOF"

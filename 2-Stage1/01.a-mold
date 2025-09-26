@@ -1,6 +1,9 @@
 # llvmtools: mold
 # Build and install as cmlfs
 
+# Ensure there is no stage0 flags
+unset CFLAGS CXXFLAGS
+
 cmake \
     -B build \
     -G Ninja -Wno-dev \
