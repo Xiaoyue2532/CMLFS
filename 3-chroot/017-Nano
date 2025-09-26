@@ -7,12 +7,10 @@ export LDFLAGS="-L/llvmtools/lib -lncursesw "
 export CPPFLAGS="-I/llvmtools/include/ncursesw "
 
 # Configure source with clang
-CC=clang \
-CXX=clang++ \
-LD=ld.lld \
+CC=clang RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl \
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl \
     --prefix=/llvmtools \
     --sysconfdir=/llvmtools/etc \
     --enable-color \

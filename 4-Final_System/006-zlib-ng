@@ -4,7 +4,7 @@
 # Configure buld with CMake
 cmake \
     -B build \
-    -G Ninja \
+    -G Ninja -Wno-dev \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_LIBDIR=lib \

@@ -8,8 +8,7 @@ find ../../cports/main/python/patches/ -type f -exec patch -Np1 -i {} \;
 rm -r Modules/expat
 
 # Configure source
-CC=clang \
-CXX=clang++ \
+CC=clang CXX=clang++ \
 ./configure \
     --prefix=/usr \
     --enable-shared \

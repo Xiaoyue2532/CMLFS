@@ -1,8 +1,7 @@
 # Final System: Check 
 # This section is done in Chroot environment
 
-CC=clang \
-CXX=clang++ \
+CC=clang CXX=clang++ \
 ./configure \
     --prefix=/usr \
     --disable-static

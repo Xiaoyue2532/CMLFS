@@ -16,7 +16,7 @@ RANLIB=llvm-ranlib \
     --without-debug \
     --without-normal \
     --with-cxx-shared \
-    --enable-pc-files \
+    --enable-cmlfs-files \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
 make -j`nproc --all` && make install

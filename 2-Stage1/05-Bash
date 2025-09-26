@@ -22,15 +22,12 @@ EOF
 
 # Configure source
 CC=clang CXX=clang++ \
-AR=llvm-ar \
-AS=llvm-as \
-RANLIB=llvm-ranlib \
-LD=ld.lld \
-STRIP=llvm-strip \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
     --prefix=/llvmtools \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl \
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl \
     --without-bash-malloc \
     --cache-file=config.cache
 

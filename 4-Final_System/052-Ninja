@@ -19,7 +19,7 @@ sed -i '/int Guess/a \
 
 # OR CMake & make:
 cmake -B build \
-    -G Ninja \
+    -G Ninja -Wno-dev \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_TESTING=OFF

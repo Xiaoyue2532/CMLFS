@@ -17,23 +17,19 @@ gl_cv_func_working_acl_get_file=yes
 EOF
 
 # Suppress a test which on some machines can loop forever:
-#sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
+# sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 
 # if build under root user
 export FORCE_UNSAFE_CONFIGURE=1
 
 # Configure source with clang
-CC=clang \
-CXX=clang++ \
-AR=llvm-ar \
-AS=llvm-as \
-RANLIB=llvm-ranlib \
-LD=ld.lld \
-STRIP=llvm-strip \
+CC=clang CXX=clang++ \
+AR=llvm-ar AS=llvm-as \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
     --prefix=/llvmtools \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl \
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl \
     --enable-install-program=hostname \
     --cache-file=config.cache
 

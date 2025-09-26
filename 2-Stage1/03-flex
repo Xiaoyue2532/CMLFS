@@ -2,13 +2,11 @@
 # Build and install as cmlfs
 
 # Configure source
-CC=clang \
-CXX=clang++ \
-LD=ld.lld \
+CC=clang CXX=clang++ \
 ./configure \
     --prefix=/llvmtools \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl
 
 # Compile and install to /llvmtools
 make -j`nproc --all` && make install

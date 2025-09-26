@@ -2,8 +2,7 @@
 # This section is done in Chroot environment
 
 # Configure wih clang
-CC=clang \
-CXX=clang++ \
+CC=clang CXX=clang++ \
 ./configure \
     --prefix=/usr \
     --sysconfdir=/etc

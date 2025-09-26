@@ -1,5 +1,5 @@
 https://astron.com/pub/file/file-5.46.tar.gz
-https://cmake.org/files/v4.0/cmake-4.0.3.tar.gz
+https://cmake.org/files/v4.1/cmake-4.1.1.tar.gz
 https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.47.tar.gz
 https://data.iana.org/time-zones/releases/tzcode2023c.tar.gz
 https://data.iana.org/time-zones/releases/tzdata2023c.tar.gz
@@ -24,11 +24,11 @@ https://github.com/libarchive/libarchive/releases/download/v3.8.1/libarchive-3.8
 https://github.com/libcheck/check/releases/download/0.15.2/check-0.15.2.tar.gz
 https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.xz
 https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz
-https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.1/llvm-project-21.1.1.src.tar.xz
 https://github.com/lz4/lz4/releases/download/v1.10.0/lz4-1.10.0.tar.gz
 https://github.com/mesonbuild/meson/releases/download/1.9.1/meson-1.9.1.tar.gz
 https://github.com/ninja-build/ninja/archive/v1.12.1/ninja-1.12.1.tar.gz
 https://github.com/openssl/openssl/releases/download/openssl-3.5.3/openssl-3.5.3.tar.gz
+https://github.com/rui314/mold/archive/refs/tags/v2.40.4.tar.gz
 https://github.com/shadow-maint/shadow/releases/download/4.18.0/shadow-4.18.0.tar.xz
 https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.xz
 https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz
@@ -36,6 +36,7 @@ https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.2.5.tar.gz
 https://gitlab.archlinux.org/pacman/pacman/-/archive/v7.0.0/pacman-v7.0.0.tar.gz
 https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250809.tgz
 https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
+https://mirrors.tuna.tsinghua.edu.cn/github-release/llvm/llvm-project/LatestRelease/llvm-project-21.1.2.src.tar.xz
 https://mirrors.ustc.edu.cn/gnu/autoconf/autoconf-2.72.tar.xz
 https://mirrors.ustc.edu.cn/gnu/automake/automake-1.18.1.tar.xz
 https://mirrors.ustc.edu.cn/gnu/bash/bash-5.3.tar.gz
@@ -52,6 +53,7 @@ https://mirrors.ustc.edu.cn/gnu/groff/groff-1.23.0.tar.gz
 https://mirrors.ustc.edu.cn/gnu/grub/grub-2.12.tar.xz
 https://mirrors.ustc.edu.cn/gnu/gzip/gzip-1.14.tar.xz
 https://mirrors.ustc.edu.cn/gnu/inetutils/inetutils-2.6.tar.xz
+https://mirrors.ustc.edu.cn/gnu/less/less-679.tar.gz
 https://mirrors.ustc.edu.cn/gnu/m4/m4-1.4.20.tar.xz
 https://mirrors.ustc.edu.cn/gnu/make/make-4.4.1.tar.gz
 https://mirrors.ustc.edu.cn/gnu/nano/nano-8.6.tar.xz
@@ -86,7 +88,5 @@ https://sourceforge.net/projects/procps-ng/files/Production/procps-ng-4.0.5.tar.
 https://sourceforge.net/projects/psmisc/files/psmisc/psmisc-23.7.tar.xz
 https://sourceware.org/ftp/elfutils/0.193/elfutils-0.193.tar.bz2
 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
-https://www.busybox.net/downloads/busybox-1.36.1.tar.bz2
 https://www.cpan.org/src/5.0/perl-5.42.0.tar.xz
-https://www.greenwoodsoftware.com/less/less-684.tar.gz
 https://www.python.org/ftp/python/3.13.7/Python-3.13.7.tgz

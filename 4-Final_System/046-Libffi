@@ -26,7 +26,7 @@ CC=clang CXX=clang++         \
     --disable-multi-os-directory \
     --with-pic \
     --with-gcc-arch="x86-64" \
-    --build="x86_64-pc-linux-musl" \
+    --build="x86_64-cmlfs-linux-musl" \
     --enable-pax_emutramp \
     --enable-portable-binary \
     --disable-exec-static-tramp

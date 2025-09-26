@@ -1,0 +1,17 @@
+# cgnutools: mold
+# Build and install as cmlfs
+
+cmake \
+    -B build \
+    -G "Ninja" -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/cgnutools" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++"
+
+cmake --build build
+
+cmake --install build
+
+# Replace GNU ld.bfd with mold
+rm -v /cgnutools/bin/ld
+ln -sv mold /cgnutools/bin/ld

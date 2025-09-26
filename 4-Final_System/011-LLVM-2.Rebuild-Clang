@@ -24,7 +24,7 @@ cmake \
     -DLLVM_BUILD_RUNTIMES=OFF \
     -DLLVM_BUILD_TOOLS=OFF \
     -DLLVM_BUILD_UTILS=OFF \
-    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
     -DLLVM_ENABLE_PROJECTS=clang \
@@ -40,7 +40,7 @@ cmake --build build
 # If build fails to compile, use below to see what component failed.
 # ninja -C build $TARGET
 # Build target break down (still unsure of order):
-# * Count is based on the x86_64-pc-linux-musl target
+# * Count is based on the x86_64-cmlfs-linux-musl target
 
 # $TARGET ........... COUNT
 # -------------------------
@@ -94,11 +94,11 @@ llvm-readelf -l a.out | grep ': /lib'
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
 
 # Check if the correct start files are used
-grep  'crt[1in]' dummy.log | grep ld.lld:
+grep  'crt[1in]' dummy.log | grep ld:
 # Should output:
-# ld.lld: /lib/Scrt1.o
-# ld.lld: /lib/crti.o
-# ld.lld: /lib/crtn.o
+# ld: /lib/Scrt1.o
+# ld: /lib/crti.o
+# ld: /lib/crtn.o
 # * /lib is a link to /usr/lib, therefore this is acceptable
 
 # Verify that stage2 rebuilt clang is searching for the correct header files:
@@ -111,20 +111,20 @@ grep -B1 -A1 '^ /usr' dummy.log
 # End of search list.
 
 # Make sure no libraries are loaded from llvmtools
-grep ld.lld:  dummy.log
+grep ld:  dummy.log
 # It should output:
-# ld.lld: /lib/Scrt1.o
-# ld.lld: /lib/crti.o
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
-# ld.lld: /tmp/dummy-b69998.o
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /lib/libunwind.so
-# ld.lld: /lib/libatomic.so
-# ld.lld: /lib/libc.so
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /lib/libunwind.so
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
-# ld.lld: /lib/crtn.o
+# ld: /lib/Scrt1.o
+# ld: /lib/crti.o
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtbegin.o
+# ld: /tmp/dummy-b69998.o
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /lib/libunwind.so
+# ld: /lib/libatomic.so
+# ld: /lib/libc.so
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /lib/libunwind.so
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtend.o
+# ld: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
 cat > atomics-test.cpp << "EOF"

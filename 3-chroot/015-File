@@ -4,12 +4,10 @@
 # and final system. 
 
 # Configure source
-CC=clang \
-CXX=clang++ \
-LD=ld.lld \
+CC=clang RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl  \
+    --build=x86_64-cmlfs-linux-musl \
+    --host=x86_64-cmlfs-linux-musl  \
     --prefix=/llvmtools      \
     --disable-libseccomp
 

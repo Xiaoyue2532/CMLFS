@@ -1,4 +1,4 @@
-# Final Stage2 clang (with compiler-rt,libcxx,libcxxabi,libunwind,lld)
+# Final Stage2 clang (with compiler-rt, libcxx, libcxxabi, libunwind)
 # Build under chroot
 #
 # NOTE: Reuse llvm-project source tree from before
@@ -33,7 +33,7 @@ cmake \
     -DCLANG_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
     -DCOMPILER_RT_CXX_LIBRARY=libcxx \
-    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
@@ -62,22 +62,21 @@ cmake \
     -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_UTILS=OFF \
-    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
-    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF \
+    -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_ENABLE_RTTI=ON \
     -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=ON \
-    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_HOST_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -101,7 +100,7 @@ cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/Extr
 # If build fails to compile, use below to see what component failed.
 # ninja -C build $TARGET
 # Build target break down (still unsure of order):
-# * Count is based on the x86_64-pc-linux-musl target
+# * Count is based on the x86_64-cmlfs-linux-musl target
 #
 # $TARGET ......... COUNT ........ STATUS
 # llvm-headers ...... 202 ......... PASS
@@ -120,8 +119,8 @@ cp ./clang/include/clang/ExtractAPI/APIRecords.inc /llvmtools/include/clang/Extr
 # Install
 cmake --install build --strip
 
-ln -sv clang-19 /usr/bin/x86_64-pc-linux-musl-clang
-ln -sv clang-19 /usr/bin/x86_64-pc-linux-musl-clang++
+ln -sv clang-19 /usr/bin/x86_64-cmlfs-linux-musl-clang
+ln -sv clang-19 /usr/bin/x86_64-cmlfs-linux-musl-clang++
 
 # cp -v ./clang/include/clang/ExtractAPI/APIRecords.inc /usr/include/clang/ExtractAPI
 # rm -rv /usr/bin/python3
@@ -157,18 +156,18 @@ done
 # NOTE: stage2 clang loads libc shared object from llvmtools. 
 # Sysroot still set to /llvmtools
 # Create a clang config to set sysroot to /
-cat > /usr/bin/x86_64-pc-linux-musl.cfg << "EOF"
+cat > /usr/bin/x86_64-cmlfs-linux-musl.cfg << "EOF"
 --sysroot=/
 EOF
 
 # NOTE: Stage2 clang looks for ld/lld first /llvmtools/bin
 # Disable it:
 mv -v /llvmtools/bin/lld{,.disabled}
-ln -sfv ld.lld /usr/bin/ld
+ln -sfv ld /usr/bin/ld
 
 # Test stage2 Clang
 echo "int main() {}" > dummy.c
-/usr/bin/x86_64-pc-linux-musl-clang \
+/usr/bin/x86_64-cmlfs-linux-musl-clang \
     dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
 # Should output:
@@ -181,7 +180,7 @@ grep  'crt[1in]' dummy.log | grep ld:
 # ld: /lib/crti.o
 # ld: /lib/crtn.o
 # * /lib is a link to /usr/lib, therefore this is acceptable
-# * ld is a link to ld.lld, therefore this is acceptable
+# * ld is a link to ld, therefore this is acceptable
 
 # Verify that stage2 clang is searching for the correct header files:
 grep -B1 -A1 '^ /usr' dummy.log
@@ -194,18 +193,18 @@ grep -B1 -A1 '^ /usr' dummy.log
 
 # Make sure no libraries are loaded from llvmtools
 grep ld:  dummy.log
-# ld.lld: /lib/Scrt1.o
-# ld.lld: /lib/crti.o
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
-# ld.lld: /tmp/dummy-1f0e32.o
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /lib/libunwind.so
-# ld.lld: /lib/libatomic.so
-# ld.lld: /lib/libc.so
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /lib/libunwind.so
-# ld.lld: /usr/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
-# ld.lld: /lib/crtn.o
+# ld: /lib/Scrt1.o
+# ld: /lib/crti.o
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtbegin.o
+# ld: /tmp/dummy-1f0e32.o
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /lib/libunwind.so
+# ld: /lib/libatomic.so
+# ld: /lib/libc.so
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /lib/libunwind.so
+# ld: /usr/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtend.o
+# ld: /lib/crtn.o
 
 # Check if stage2 clang++ supports atomics.
 cat > atomics-test.cpp << "EOF"
@@ -220,7 +219,7 @@ int main() {
 }
 EOF
 
-/usr/bin/x86_64-pc-linux-musl-clang++ \
+/usr/bin/x86_64-cmlfs-linux-musl-clang++ \
     atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
 
 # Check for errors during compile or link:
@@ -254,7 +253,7 @@ int main() {
 }
 EOF
 
-/usr/bin/x86_64-pc-linux-musl-clang++ \
+/usr/bin/x86_64-cmlfs-linux-musl-clang++ \
     cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
 
 # Check for errors during compile or link:

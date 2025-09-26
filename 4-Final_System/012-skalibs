@@ -6,7 +6,7 @@ CC=clang \
 CXX=clang \
 ./configure \
     --prefix=/usr \
-    --build="x86_64-pc-linux-musl" \
+    --build="x86_64-cmlfs-linux-musl" \
     --enable-static \
     --enable-shared \
     --libdir=/usr/lib

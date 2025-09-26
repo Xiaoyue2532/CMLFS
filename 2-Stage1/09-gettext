@@ -1,7 +1,7 @@
-# Stage1: Gawk
+# Stage1: Gettext
 # Build and install as cmlfs
 
-# Configure source with clang
+# Build with clang
 CC=clang CXX=clang++ \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
@@ -10,5 +10,7 @@ RANLIB=llvm-ranlib STRIP=llvm-strip \
     --host=x86_64-cmlfs-linux-musl \
     --prefix=/llvmtools
 
-# Build and install to toolchain
 make -j`nproc --all` && make install
+
+# Install the msgfmt, msgmerge and xgettext programs to toolchain
+cp -v autopoint msgfmt msgmerge xgettext /llvmtools/bin

@@ -2,10 +2,10 @@
 # Build and install as cmlfs
 
 # Build
-CC=x86_64-pc-linux-musl-gcc  \
-CXX=x86_64-pc-linux-musl-g++ \
-AR=x86_64-pc-linux-musl-ar \
-RANLIB=x86_64-pc-linux-musl-ranlib \
+CC=x86_64-cmlfs-linux-musl-gcc  \
+CXX=x86_64-cmlfs-linux-musl-g++ \
+AR=x86_64-cmlfs-linux-musl-ar \
+RANLIB=x86_64-cmlfs-linux-musl-ranlib \
 make PREFIX="/llvmtools" -j`nproc --all`
 
 # Install to llvmtools

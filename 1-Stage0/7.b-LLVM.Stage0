@@ -1,4 +1,4 @@
-# cgnutools: Stage0 Clang ( with compiler-rt,libcxx,libcxxabi,libunwind,lld)
+# cgnutools: Stage0 Clang (with compiler-rt, libcxx, libcxxabi, libunwind)
 # Build as cmlfs
 #
 # o Reuse llvm-project source tree from before
@@ -29,14 +29,13 @@ cmake \
     -G "Ninja" -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/cgnutools" \
-    -DCMAKE_C_COMPILER="x86_64-pc-linux-musl-gcc" \
-    -DCMAKE_CXX_COMPILER="x86_64-pc-linux-musl-g++" \
-    -DCMAKE_AR="/cgnutools/bin/x86_64-pc-linux-musl-ar" \
-    -DCMAKE_NM="/cgnutools/bin/x86_64-pc-linux-musl-nm" \
-    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-pc-linux-musl-ranlib" \
+    -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-gcc" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-g++" \
+    -DCMAKE_AR="/cgnutools/bin/x86_64-cmlfs-linux-musl-ar" \
+    -DCMAKE_NM="/cgnutools/bin/x86_64-cmlfs-linux-musl-nm" \
+    -DCMAKE_RANLIB="/cgnutools/bin/x86_64-cmlfs-linux-musl-ranlib" \
     -DCLANG_BUILD_EXAMPLES=OFF \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
-    -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCLANG_INCLUDE_TESTS=OFF \
@@ -46,7 +45,7 @@ cmake \
     -DCOMPILER_RT_BUILD_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
-    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DCOMPILER_RT_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=OFF \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
@@ -75,18 +74,18 @@ cmake \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_UTILS=OFF \
     -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_ENABLE_EH=ON \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF \
+    -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_ENABLE_RTTI=ON \
     -DLLVM_ENABLE_RUNTIMES="compiler-rt;libunwind;libcxx;libcxxabi" \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=OFF \
-    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_HOST_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -94,16 +93,14 @@ cmake \
     -DLLVM_INSTALL_UTILS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
-    -DLLVM_TARGET_ARCH="host"
-
-# no -DLLVM_ENABLE_LLD=ON \
+    -DLLVM_TARGET_ARCH="host" \
+    ../llvm
 
 # compile
-cmake --build build
+ninja
 
 # For troubleshooting, this is the breakdown of build targets:
 # Note: Order from least to most deps not acertained yet.
-ninja -C build lld # ............................................... PASS
 ninja -C build clang # ............................................. PASS
 ninja -C build llvm-tblgen # ....................................... PASS
 ninja -C build llvm-lib # 1868 targets ............................. PASS
@@ -119,14 +116,14 @@ ninja -C build # 570 ............................................... PASS
 cmake --install build --strip
 
 # Make LLD the default linker
-ln -sv clang-19 /cgnutools/bin/x86_64-pc-linux-musl-clang
-ln -sv clang-19 /cgnutools/bin/x86_64-pc-linux-musl-clang++
+ln -sv clang-19 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang
+ln -sv clang-19 /cgnutools/bin/x86_64-cmlfs-linux-musl-clang++
 
 # Disable cross-gcc ... will use stage0 clang instead
 mv -v /cgnutools/lib/gcc{,-disabled}
 
 # Configure stage0 clang
-cat > /cgnutools/bin/x86_64-pc-linux-musl.cfg <<EOF
+cat > /cgnutools/bin/x86_64-cmlfs-linux-musl.cfg <<EOF
 -L/cgnutools/lib
 -nostdinc++
 -I/cgnutools/include/c++/v1
@@ -139,34 +136,34 @@ echo "/cgnutools/lib" >> /llvmtools/etc/ld-musl-x86_64.path
 
 # Test stage0 Clang
 echo "int main() {}" > dummy.c
-/cgnutools/bin/x86_64-pc-linux-musl-clang \
+/cgnutools/bin/x86_64-cmlfs-linux-musl-clang \
     dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /llvmtools'
 # Shoud output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
 
 # Check if the correct start files are used
-grep  'crt[1in]' dummy.log | grep ld.lld:
+grep  'crt[1in]' dummy.log | grep ld:
 # Should output:
-# ld.lld: /llvmtools/lib/Scrt1.o
-# ld.lld: /llvmtools/lib/crti.o
-# ld.lld: /llvmtools/lib/crtn.o
+# ld: /llvmtools/lib/Scrt1.o
+# ld: /llvmtools/lib/crti.o
+# ld: /llvmtools/lib/crtn.o
 
 # Make sure no libraries are loaded from the host
-grep ld.lld:  dummy.log
+grep ld:  dummy.log
 # Should output:
-# ld.lld: /llvmtools/lib/Scrt1.o
-# ld.lld: /llvmtools/lib/crti.o
-# ld.lld: /cgnutools/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtbegin.o
-# ld.lld: /tmp/dummy-ffb57c.o
-# ld.lld: /mnt/cmlfs/cgnutools/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /llvmtools/lib/libunwind.so
-# ld.lld: /llvmtools/lib/libatomic.so
-# ld.lld: /llvmtools/lib/libc.so
-# ld.lld: /cgnutools/lib/clang/19/lib/x86_64-pc-linux-musl/libclang_rt.builtins.a
-# ld.lld: /llvmtools/lib/libunwind.so
-# ld.lld: /cgnutools/lib/clang/19/lib/x86_64-pc-linux-musl/clang_rt.crtend.o
-# ld.lld: /llvmtools/lib/crtn.o
+# ld: /llvmtools/lib/Scrt1.o
+# ld: /llvmtools/lib/crti.o
+# ld: /cgnutools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtbegin.o
+# ld: /tmp/dummy-ffb57c.o
+# ld: /mnt/cmlfs/cgnutools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /llvmtools/lib/libunwind.so
+# ld: /llvmtools/lib/libatomic.so
+# ld: /llvmtools/lib/libc.so
+# ld: /cgnutools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/libclang_rt.builtins.a
+# ld: /llvmtools/lib/libunwind.so
+# ld: /cgnutools/lib/clang/19/lib/x86_64-cmlfs-linux-musl/clang_rt.crtend.o
+# ld: /llvmtools/lib/crtn.o
 
 # Verify that stage0 clang is searching for the correct header files:
 grep -B2 -A1 '^ /llvmtools/usr/include' dummy.log
@@ -189,7 +186,7 @@ int main() {
 }
 EOF
 
-/cgnutools/bin/x86_64-pc-linux-musl-clang++ \
+/cgnutools/bin/x86_64-cmlfs-linux-musl-clang++ \
     atomics-test.cpp -v -Wl,--verbose &> atomics-test.log
 
 # Check for errors during compile or link:
@@ -213,7 +210,7 @@ int main(){
 }
 EOF
 
-/cgnutools/bin/x86_64-pc-linux-musl-clang++ \
+/cgnutools/bin/x86_64-cmlfs-linux-musl-clang++ \
     cxx11-test.cpp -v -Wl,--verbose &> cxx11-test.log
 
 # Check for errors during compile or link:

@@ -2,18 +2,18 @@
 # This section is done in Chroot environment
 
 # Create a new configuration for stage1 clang:
-touch /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg
-ln -sfv clang-19 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang
-ln -sfv clang-19 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang++
+touch /llvmtools/bin/$(uname -m)-cmlfs-linux-musl.cfg
+ln -sfv clang-19 /llvmtools/bin/$(uname -m)-cmlfs-linux-musl-clang
+ln -sfv clang-19 /llvmtools/bin/$(uname -m)-cmlfs-linux-musl-clang++
 
 # Re-configure clang to use new sysroot (/) with newly built musl Libc
 echo "--sysroot=/ " > \
-     /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg
+     /llvmtools/bin/$(uname -m)-cmlfs-linux-musl.cfg
 
 # With the sysroot changed, disable the stage1 clang's defaults. Then
 # manually set the order of header paths, library paths and default shared
 # objects that are linked:
-cat >> /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg << EOF
+cat >> /llvmtools/bin/$(uname -m)-cmlfs-linux-musl.cfg << EOF
 -nostdinc++
 -nostdinc
 -isystem/usr/include/c++/v1
@@ -26,8 +26,8 @@ cat >> /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg << EOF
 EOF
 
 # Update the build environment
-export CC=$(uname -m)-pc-linux-musl-clang
-export CXX=$(uname -m)-pc-linux-musl-clang++
+export CC=$(uname -m)-cmlfs-linux-musl-clang
+export CXX=$(uname -m)-cmlfs-linux-musl-clang++
 
 # Adjust the library search path for the dynamic loader in llvmtools:
 cp -v /llvmtools/etc/ld-musl-x86_64.path{,.orig}
@@ -54,10 +54,10 @@ llvm-readelf -l a.out | grep ': /lib'
 # [Requesting program interpreter: /lib/ld-musl-arch64.so.1]
 
 # Make sure that we're setup to use the correct start files: 
-grep 'ld.lld:' dummy.log | grep 'crt[1in]'
-# ld.lld: /usr/lib/Scrt1.o
-# ld.lld: /usr/lib/crti.o
-# ld.lld: /usr/lib/crtn.o
+grep 'ld:' dummy.log | grep 'crt[1in]'
+# ld: /usr/lib/Scrt1.o
+# ld: /usr/lib/crti.o
+# ld: /usr/lib/crtn.o
 
 # Verify that the compiler is searching for the correct 
 # header files: 
