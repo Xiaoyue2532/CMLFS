@@ -17,6 +17,3 @@ cmake --build build
 
 # Install
 cmake --install build
-
-# Create symlink for mold as GNU ld
-ln -sv mold /llvmtools/bin/ld

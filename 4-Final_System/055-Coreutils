@@ -2,7 +2,7 @@
 # This section is done in Chroot environment
 
 # Configure
-CC=clang \
+CC=clang CXX=clang++ \
 CXX=clang++     \
 ac_cv_func_syncfs=no     \
 FORCE_UNSAFE_CONFIGURE=1 \

@@ -7,6 +7,7 @@ patch -Np1 -i ../../cports/main/libarchive/patches/filter-xz-enable-threads.patc
 
 # Configure source
 CC=clang CXX=clang++ \
+LD=ld.mold \
 ./configure \
     --build=x86_64-cmlfs-linux-musl \
     --host=x86_64-cmlfs-linux-musl \

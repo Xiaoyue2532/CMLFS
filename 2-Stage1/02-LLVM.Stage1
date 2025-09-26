@@ -81,9 +81,6 @@ cmake \
     -DZLIB_INCLUDE_DIR="/llvmtools/include" \
     -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so"
 
-# -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
-# -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
-
 # compile
 cmake --build build
 

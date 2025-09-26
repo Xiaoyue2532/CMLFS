@@ -65,7 +65,7 @@ cmake \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-cmlfs-linux-musl" \
     -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_ENABLE_EH=ON \
-    -DLLVM_ENABLE_LIBCXX=ON \
+    -DLLVM_ENABLE_LIBCXX=OFF \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
@@ -88,9 +88,6 @@ cmake \
     -DZLIB_INCLUDE_DIR="/usr/include" \
     -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so" \
     ../llvm
-
-# -DLLVM_INSTALL_BINUTILS_SYMLINKS=ON \
-# -DLLVM_INSTALL_CCTOOLS_SYMLINKS=ON \
 
 # compile (~ 4,048 targets)
 cmake --build build

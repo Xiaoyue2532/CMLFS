@@ -14,8 +14,7 @@ patch -Np1 -i ../patches/chimerautils-cmlfs/libressl-evp-noblake2b512-support.pa
 CC=clang CXX=clang++ \
 AR=llvm-ar \
 AS=llvm-as \
-RANLIB=llvm-ranlib \
-STRIP=llvm-strip \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 meson \
     --prefix=/llvmtools \
     --sbindir=bin \

@@ -22,6 +22,7 @@ EOF
 
 # Configure source
 CC=clang CXX=clang++ \
+LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
 RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./configure \

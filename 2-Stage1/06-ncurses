@@ -5,6 +5,7 @@
 mkdir build
 pushd build
     CC=clang CXX=clang++ \
+    LD=ld.mold \
     ../configure AWK=gawk
     make -C include -j`nproc --all`
     make -C progs tic -j`nproc --all`
@@ -12,6 +13,7 @@ popd
 
 # Build
 CC=clang CXX=clang++ \
+LD=ld.mold \
 ./configure \
     --prefix=/llvmtools \
     --host=x86_64-cmlfs-linux-musl \

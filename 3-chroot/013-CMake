@@ -5,12 +5,11 @@
 CC=clang CXX=clang++ \
 LD=ld.mold \
 AR=llvm-ar AS=llvm-as \
-RANLIB=llvm-ranlib \
-STRIP=llvm-strip \
+RANLIB=llvm-ranlib STRIP=llvm-strip \
 ./bootstrap \
     --prefix=/llvmtools \
     --mandir=/share/man \
-    --docdir=/share/doc/cmake-4.0.3 \
+    --docdir=/share/doc/cmake-4.1.1 \
     --no-system-jsoncpp \
     --no-system-librhash \
     --no-system-curl \

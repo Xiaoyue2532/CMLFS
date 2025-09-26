@@ -3,6 +3,7 @@
 
 # Configure source
 CC=clang CXX=clang++ \
+LD=ld.mold \
 ./configure \
     --prefix=/llvmtools \
     --build=x86_64-cmlfs-linux-musl \

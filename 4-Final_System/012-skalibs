@@ -2,7 +2,7 @@
 # This section is done in Chroot environment
 
 # Configure source
-CC=clang \
+CC=clang CXX=clang++ \
 CXX=clang \
 ./configure \
     --prefix=/usr \
