@@ -1,0 +1,7 @@
+# Final System: binutils_headers
+# This section is done in Chroot environment
+
+# ld.mold LTO function relies on LLVMgold.so
+# LLVMgold.so relies on binutils's plugin-api.h header
+
+cp binutils/include/plugin-api.h /usr/include/

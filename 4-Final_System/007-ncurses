@@ -1,12 +1,12 @@
-# Final System: netbsd-curses
-# Build and install under chroot
+# Final System: ncurses
+# This section is done in Chroot environment
 
 # Build
-CC=clang CXX=clang++ \
-LD=ld.mold \
-AR=llvm-ar AS=llvm-as \
-RANLIB=llvm-ranlib STRIP=llvm-strip \
-OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
+# CC=clang CXX=clang++ \
+# LD=ld.mold \
+# AR=llvm-ar AS=llvm-as \
+# RANLIB=llvm-ranlib STRIP=llvm-strip \
+# OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/usr \
     --mandir=/usr/share/man \
@@ -37,3 +37,25 @@ for b in infocmp tabs tic tput tset
 do
     patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
 done
+
+# fix python cannot find term.h
+cd /usr/include/ncursesw && mv * ../
+
+ln -s ../curses.h &&
+ln -s ../cursesapp.h &&
+ln -s ../cursesf.h &&
+ln -s ../cursesm.h &&
+ln -s ../cursesp.h &&
+ln -s ../cursesw.h &&
+ln -s ../cursslk.h &&
+ln -s ../eti.h &&
+ln -s ../etip.h &&
+ln -s ../form.h &&
+ln -s ../menu.h &&
+ln -s ../ncurses.h &&
+ln -s ../ncurses_dll.h &&
+ln -s ../panel.h &&
+ln -s ../term.h &&
+ln -s ../term_entry.h &&
+ln -s ../termcap.h &&
+ln -s ../unctrl.h

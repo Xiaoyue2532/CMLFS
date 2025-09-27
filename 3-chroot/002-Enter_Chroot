@@ -1,6 +1,8 @@
 # Enter the Chroot Environment
 # This section is done by root
 
+export CMLFS="/mnt1"
+
 chroot "$CMLFS" /llvmtools/bin/env -i \
     HOME=/root \
     TERM="$TERM" \

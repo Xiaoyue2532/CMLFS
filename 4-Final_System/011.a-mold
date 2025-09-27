@@ -1,0 +1,18 @@
+# Final System: mold
+# This section is done in Chroot environment
+
+cmake \
+    -B build \
+    -G Ninja -Wno-dev \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="/usr" \
+    -DCMAKE_C_COMPILER="x86_64-cmlfs-linux-musl-clang" \
+    -DCMAKE_CXX_COMPILER="x86_64-cmlfs-linux-musl-clang++"
+
+# Compile
+cmake --build build
+
+# Install
+cmake --install build
+
+ln -s mold /usr/bin/ld

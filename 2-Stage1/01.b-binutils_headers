@@ -1,3 +1,6 @@
+# llvmtools: binutils_headers
+# Build and install as cmlfs
+
 # ld.mold LTO function relies on LLVMgold.so
 # LLVMgold.so relies on binutils's plugin-api.h header
 
