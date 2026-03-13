@@ -1,11 +1,6 @@
 # Final System - Adjust Clang
 # This section is done in Chroot environment
 
-# Create a new configuration for stage1 clang:
-touch /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg
-ln -sfv clang-21 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang
-ln -sfv clang-21 /llvmtools/bin/$(uname -m)-pc-linux-musl-clang++
-
 # Re-configure clang to use new sysroot (/) with newly built musl Libc
 echo "--sysroot=/ " > \
      /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg
@@ -18,7 +13,7 @@ cat >> /llvmtools/bin/$(uname -m)-pc-linux-musl.cfg << EOF
 -nostdinc
 -isystem/usr/include/c++/v1
 -L/usr/lib
--lc -lc++ -lunwind -latomic
+-lc -lc++ -lunwind
 -I/llvmtools/include/c++/v1
 -I/usr/include
 -I/llvmtools/include
@@ -55,9 +50,9 @@ llvm-readelf -l a.out | grep ': /lib'
 
 # Make sure that we're setup to use the correct start files: 
 grep 'ld.lld:' dummy.log | grep 'crt[1in]'
-# ld.lld: /usr/lib/Scrt1.o
-# ld.lld: /usr/lib/crti.o
-# ld.lld: /usr/lib/crtn.o
+# ld.lld: /lib/Scrt1.o
+# ld.lld: /lib/crti.o
+# ld.lld: /lib/crtn.o
 
 # Verify that the compiler is searching for the correct 
 # header files: 

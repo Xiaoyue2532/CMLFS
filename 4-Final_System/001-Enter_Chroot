@@ -14,10 +14,12 @@ chown -Rv arch:arch /home/arch
 
 Exit your current chroot, then chroot into your new user (make sure 1000, 1000 and arch are set to the proper values for your system):
 
+export CMLFS=/mnt1
+
 chroot --userspec=1000:1000 "$CMLFS" /llvmtools/bin/env -i \
     HOME=/home/arch \
     TERM="$TERM" \
-    PS1='(cmlfs chroot) [\u@\h \W]\$ ' \
+    PS1='(chroot) [\u@\h \W]\$ ' \
     PATH=/home/arch/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
     PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
     /llvmtools/bin/bash

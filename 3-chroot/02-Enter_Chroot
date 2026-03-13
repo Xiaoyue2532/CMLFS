@@ -4,7 +4,7 @@
 chroot "$CMLFS" /llvmtools/bin/env -i \
     HOME=/root \
     TERM="$TERM" \
-    PS1='(cmlfs chroot) [\u@\h \W]\$ ' \
+    PS1='(chroot) [\u@\h \W]\$ ' \
     PATH=/root/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
     PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
     /llvmtools/bin/bash
@@ -16,11 +16,9 @@ case $(uname -m) in
               export   MCA="i386"   ;;
      x86_64)  export TUPLE="x86_64-pc-linux-musl"     
               export   MCA="x86_64" ;;
-     aarch64) export TUPLE="aarch64-pc-linux-musleabihf" 
+     aarch64) export TUPLE="aarch64-unknown-linux-musl" 
               export   MCA="aarch64" ;;
-     armv7*)  export TUPLE="armv7l-pc-linux-musleabihf"  
-              export   MCA="arm" ;;
-     armv6*)  export TUPLE="armv6l-pc-linux-musleabihf"  
+     armv7*)  export TUPLE="arm-unknown-linux-musleabihf"  
               export   MCA="arm" ;;
 esac
 
@@ -28,6 +26,7 @@ ln -sf /llvmtools/bin/clang-21 /root/.bin/as
 ln -sf /llvmtools/bin/clang-21 /root/.bin/cc
 ln -sf /llvmtools/bin/clang-21 /root/.bin/c++
 ln -sf /llvmtools/bin/ld.lld /root/.bin/ld
+ln -sf /llvmtools/bin/llvm-addr2line /root/.bin/addr2line
 ln -sf /llvmtools/bin/llvm-ar /root/.bin/ar
 ln -sf /llvmtools/bin/llvm-nm /root/.bin/nm
 ln -sf /llvmtools/bin/llvm-objcopy /root/.bin/objcopy
@@ -35,4 +34,5 @@ ln -sf /llvmtools/bin/llvm-objdump /root/.bin/objdump
 ln -sf /llvmtools/bin/llvm-ranlib /root/.bin/ranlib
 ln -sf /llvmtools/bin/llvm-readelf /root/.bin/readelf
 ln -sf /llvmtools/bin/llvm-size /root/.bin/size
+ln -sf /llvmtools/bin/llvm-strings /root/.bin/strings
 ln -sf /llvmtools/bin/llvm-strip /root/.bin/strip

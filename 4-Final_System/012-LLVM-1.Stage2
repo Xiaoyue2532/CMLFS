@@ -7,17 +7,11 @@
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.restore.patch 
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.restore.patch
 
-# stage2 /llvmtools/include have __libunwind_config.h and unwind_itanium.h
-# - libunwind/include/unwind.h: "__libunwind_config.h" -> <__libunwind_config.h>
-# - libunwind/include/unwind.h: "unwind_itanium.h" -> <unwind_itanium.h>
-
-# # stage1 clang cannot find zstd headers
-# ln -sv /usr/include/zstd.h  /llvmtools/include/
-# ln -sv /llvmtools/bin/python3 /usr/bin/python3
-
 # -fPIC is not necessary
 # export CFLAGS="-fPIC "
 # export CXXFLAGS=$CFLAGS
+
+export LDFLAGS="-Wl,-z,stack-size=2097152 "
 
 # Configure source [to build all of LLVM]
 cmake \
@@ -25,12 +19,16 @@ cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/usr" \
     -DCMAKE_C_COMPILER="clang" \
+    -DCMAKE_C_COMPILER_LAUNCHER="sccache" \
     -DCMAKE_CXX_COMPILER="clang++" \
+    -DCMAKE_CXX_COMPILER_LAUNCHER="sccache" \
     -DCMAKE_AR="/llvmtools/bin/llvm-ar" \
     -DCMAKE_NM="/llvmtools/bin/llvm-nm" \
     -DCMAKE_RANLIB="/llvmtools/bin/llvm-ranlib" \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
+    -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
@@ -44,7 +42,7 @@ cmake \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
-    -DLIBCXX_ENABLE_LOCALIZATION=ON \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
     -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
     -DLIBCXX_USE_COMPILER_RT=ON \
@@ -63,6 +61,7 @@ cmake \
     -DLLVM_ENABLE_ZSTD=ON \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH=host \
@@ -70,8 +69,10 @@ cmake \
     -DZLIB_LIBRARY_RELEASE="/usr/lib/libz.so" \
     ../llvm
 
-# if LLVM_ENABLE_LIBCXX=ON, you may see unused option -stdlib=libc++
-# LIBCXXABI_ENABLE_STATIC_UNWINDER and LLVM_ENABLE_LLD are not necessary
+# COMPILER_RT_BUILD_GWP_ASAN needs libexecinfo
+# it seems that building compiler-rt sanitizers and other components 
+# with musl libc doesn't require libatomic-chimera
+# but on glibc the options above only produces CRT files and builtin.a
 
 # compile (~ 4,048 targets)
 ninja
@@ -97,8 +98,6 @@ ninja
 
 # Install
 ninja install/strip
-
-# rm -rv /usr/bin/python3
 
 # Fix the dynamic linker for the executables:
 for b in bugpoint c-index-test clang-21 count diagtool dsymutil FileCheck \
@@ -241,8 +240,8 @@ llvm-readelf -d /usr/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 llvm-readelf -d /usr/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libzstd.so.1]
-# Shared library: [libterminfo.so]
 # Shared library: [libc++.so.1]
+# Shared library: [libc++abi.so.1]
 # Shared library: [libc.so]
 
 # If all is well, clean up
@@ -258,7 +257,3 @@ export CC=clang CXX=clang++
 
 # Create a symlink required by the FHS for "historical" reasons
 ln -sv ../bin/clang-21 /usr/lib/cpp
-
-# fix posixtz need c99
-cp ../../cports/main/llvm/files/c99 /usr/bin/c99
-chmod +x /usr/bin/c99

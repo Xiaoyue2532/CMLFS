@@ -1,0 +1,17 @@
+# Final System: pacman
+# install pacman to the final system
+
+meson setup \
+    --prefix=/usr \
+    --buildtype=release \
+    -Dsysconfdir="/etc" \
+    -Dlocalstatedir="/var" \
+    -Ddoc=disabled \
+    -Ddoxygen=disabled \
+    -Dscriptlet-shell=/usr/bin/bash \
+    -Dldconfig=/usr/bin/ldconfig \
+    build
+
+meson compile -C build
+
+meson install -C build

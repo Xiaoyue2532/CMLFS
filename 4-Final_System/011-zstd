@@ -1,0 +1,18 @@
+# Final System: Zstd
+# This section is done in Chroot environment
+
+mkdir build-zstd && cd build-zstd
+
+cmake \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DZSTD_MULTITHREAD_SUPPORT=ON \
+    -DBUILD_TESTING=OFF \
+    ../build/cmake
+
+ninja && ninja install/strip
+
+# Set the dynamic loader for zstd executable
+patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/zstd

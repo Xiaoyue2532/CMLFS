@@ -1,0 +1,24 @@
+# Final System: netbsd-curses
+# Build and install under chroot
+
+# Build
+./configure \
+    --prefix=/usr \
+    --mandir=/usr/share/man \
+    --with-shared \
+    --without-debug \
+    --without-normal \
+    --with-cxx-shared \
+    --enable-pc-files \
+    --with-pkg-config-libdir=/usr/lib/pkgconfig
+
+make -j`nproc --all` && make install
+
+sed -e 's/^#if.*XOPEN.*$/#if 1/' \
+    -i /usr/include/curses.h
+    
+# Set the dynamic loader for each executable
+for b in infocmp clear tput tic tset tabs toe
+do
+    patchelf --set-interpreter /lib/ld-musl-x86_64.so.1 /usr/bin/$b
+done

@@ -3,10 +3,6 @@
 #
 # o Reuse llvm-project source tree from before
 
-# in stage1, there is no unwind headers in /llvmtools
-# - libunwind/include/unwind.h: <__libunwind_config.h> -> "__libunwind_config.h"
-# - libunwind/include/unwind.h: <unwind_itanium.h> -> "unwind_itanium.h"
-
 # -fPIC is not necessary
 # export CFLAGS="-fPIC "
 # export CXXFLAGS=$CFLAGS
@@ -32,6 +28,8 @@ cmake \
     -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
+    -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
@@ -51,6 +49,7 @@ cmake \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
     -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
     -DLIBCXX_USE_COMPILER_RT=ON \
@@ -68,6 +67,7 @@ cmake \
     -DLLVM_ENABLE_ZSTD=OFF \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH="host" \
@@ -75,8 +75,10 @@ cmake \
     -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so" \
     ../llvm
 
-# if LLVM_ENABLE_LIBCXX=ON, you may see unused option -stdlib=libc++
-# LIBCXXABI_ENABLE_STATIC_UNWINDER and LLVM_ENABLE_LLD are not necessary
+# LLVM_ENABLE_LIBCXX=ON means extra option -stdlib=libc++ would be passed to clang, which is a unused option
+# LLVM_ENABLE_LLD means extra option -fuse-ld=lld would be passed to clang, which is dumplicated with CLANG_DEFAULT_LINKER
+# LIBCXXABI_ENABLE_STATIC_UNWINDER means libc++abi.so doesn't depend on libunwind.so
+# LIBCXX_ENABLE_STATIC_ABI_LIBRARY means libc++.so doesn't depend on libc++abi.so
 
 # compile
 ninja
@@ -203,7 +205,6 @@ grep error: cxx11-test.log
 llvm-readelf -d /llvmtools/lib/libunwind.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 llvm-readelf -d /llvmtools/lib/libc++.so.1.0 | grep Shared | cut -b 37-
-# Shared library: [libc++abi.so.1]
 # Shared library: [libc.so]
 llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]

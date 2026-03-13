@@ -26,14 +26,12 @@ patch -Np1 -i ../../cports/main/musl/patches/default-locpath.patch
 
 # Configure
 CC=clang \
-LD=ld.lld \
 LIBCC=`clang -print-libgcc-file-name` \
 ./configure \
     --prefix=/usr \
     --sysconfdir=/etc \
     --localstatedir=/var \
-    --disable-gcc-wrapper \
-    --enable-debug
+    --disable-gcc-wrapper
 
 # Build and install 
 make -j`nproc --all` && make install
@@ -57,9 +55,9 @@ case $(uname -m) in
 esac
 
 # Create config for dynamic library loading:
-cat > /etc/ld-musl-$CARCH.path <<EOF
-/lib
+cat > /etc/ld-musl-x86_64.path <<EOF
 /usr/lib
+/lib
 EOF
 
 # Create compatibility link for i686, as some software, like SMPlayer
