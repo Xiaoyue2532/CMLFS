@@ -1,4 +1,4 @@
-# Stage1: Patch 
+# Chroot: patch 
 # Build under chroot
 
 # Configure source with clang

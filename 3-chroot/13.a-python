@@ -1,4 +1,4 @@
-# Stage1: Python3
+# Chroot: python
 # Build under chroot
 
 # Apply fixes to build under musl
@@ -8,12 +8,11 @@ find ../../cports/main/python/patches/ -type f -exec patch -Np1 -i {} \;
 ./configure \
     --prefix=/llvmtools \
     --enable-shared \
+    --with-lto=thin \
     --with-ensurepip
 
 # Build and install to toolchain
 make -j`nproc --all` && make install
 
-chmod -v 755 /llvmtools/lib/libpython3.13.so &&
-chmod -v 755 /llvmtools/lib/libpython3.so 
-
+# Create a compatibility link
 ln -sv python3 /llvmtools/bin/python

@@ -1,0 +1,6 @@
+# Chroot: libcap 
+# Build under chroot
+
+make CC=clang -j`nproc --all`
+
+make CC=clang RAISE_SETFCAP=no lib=lib prefix=/llvmtools install

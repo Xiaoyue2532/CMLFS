@@ -1,15 +1,9 @@
-# Stage1: Nano 
+# Chroot: Nano 
 # Build under chroot
 # Optional package: Text editor for convenience or trouble shooting
 
-# Set flags, so curses headers can be found in /llvmtools/include
-export LDFLAGS="-L/llvmtools/lib -lncursesw "
-export CPPFLAGS="-I/llvmtools/include/ncursesw "
-
 # Configure source with clang
 ./configure \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl \
     --prefix=/llvmtools \
     --sysconfdir=/llvmtools/etc \
     --enable-color \
@@ -19,6 +13,5 @@ export CPPFLAGS="-I/llvmtools/include/ncursesw "
 # Build and install to toolchain
 make -j`nproc --all` && make install
 
+# Copy example nano configuration file
 cp -v doc/sample.nanorc /llvmtools/etc/nanorc
-
-unset LDFLAGS CPPFLAGS

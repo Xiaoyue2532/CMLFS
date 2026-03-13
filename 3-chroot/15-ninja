@@ -1,8 +1,6 @@
 # Chroot: Ninja
 # Build and install under chroot
 
-# NOTE: This is optional if ninja is preferred over samurai
-
 # If desired, add the capability to use the
 # environment variable NINJAJOBS
 sed -i '/int Guess/a \
@@ -12,14 +10,14 @@ sed -i '/int Guess/a \
   if ( j > 0 ) return j;\
 ' src/ninja.cc
 
+mkdir build && cd build
+
 # Configure source with cmake:
-cmake -B out \
+cmake \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=/llvmtools \
-    -DBUILD_TESTING=OFF
+    -DBUILD_TESTING=OFF \
+    ../
 
-# Compile
-make -C out -j`nproc --all`
-
-# Install
-make -C out install
+# Build and install to toolchain
+make -j`nproc --all` && make install

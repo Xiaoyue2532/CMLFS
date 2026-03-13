@@ -4,7 +4,7 @@
 export CMLFS=/mnt1
 
 # Create directories and nodes
-mkdir -pv $CMLFS/{dev,proc,sys,run}
+mkdir -pv $CMLFS/{dev,proc,sys,run,tmp}
 mknod -m 600 $CMLFS/dev/console c 5 1
 mknod -m 666 $CMLFS/dev/null c 1 3
 
@@ -14,6 +14,7 @@ mount -vt devpts devpts $CMLFS/dev/pts -o gid=5,mode=620
 mount -vt proc proc $CMLFS/proc
 mount -vt sysfs sysfs $CMLFS/sys
 mount -vt tmpfs tmpfs $CMLFS/run
+mount -vt tmpfs tmpfs $CMLFS/tmp
 if [ -h $CMLFS/dev/shm ]; then
   mkdir -pv $CMLFS/$(readlink $CMLFS/dev/shm)
 fi

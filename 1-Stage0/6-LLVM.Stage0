@@ -25,7 +25,7 @@ export LDFLAGS="-Wl,-z,stack-size=2097152 "
 #     Properties: stack size: 0x200000
 # 0x200000 in hex is 2*2^20 in decimal, which means llvm binaries have a 2MB stack.
 
-# Release build use optimize level 3 by default, which is memory-consuming and slow for building.
+# Release build use optimize level 3 by default, which is memory-consuming and slow for LLVM building.
 # sudo nano /usr/share/cmake/Modules/Compiler/GNU.cmake
 # string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O3") -> string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O2")
 

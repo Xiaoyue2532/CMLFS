@@ -1,4 +1,4 @@
-# Stage1: file
+# Chroot: file
 # Build and install under chroot
 # Must use same version for llvmtools 
 # and final system. 

@@ -1,7 +1,0 @@
-# Stage1: pkgconf 
-# Build under chroot
-
-./configure \
-    --prefix=/llvmtools
-
-make -j`nproc --all` && make install

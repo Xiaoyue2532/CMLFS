@@ -1,4 +1,4 @@
-# Stage1: Kernel Headers
+# Chroot: Kernel Headers
 # Use latest kernel version when possible
 # This section is done in Chroot environment
 

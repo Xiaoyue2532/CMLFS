@@ -1,9 +1,11 @@
-# Chroot: findutils
+# Chroot: fakeroot
 # Build under chroot
 
 # Configure source with clang
 ./configure \
-    --prefix=/llvmtools
+    --prefix=/llvmtools \
+    --libdir=/llvmtools/lib/libfakeroot \
+    --disable-static
 
 # Build and install to toolchain
 make -j`nproc --all` && make install

@@ -1,4 +1,4 @@
-# Chroot: findutils
+# Chroot: pkgconf 
 # Build under chroot
 
 # Configure source with clang
@@ -7,3 +7,6 @@
 
 # Build and install to toolchain
 make -j`nproc --all` && make install
+
+# Create a compatibility link
+ln -s pkgconf /llvmtools/bin/pkg-config

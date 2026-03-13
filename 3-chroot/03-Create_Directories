@@ -4,7 +4,7 @@
 mkdir -pv /{boot,etc/{opt,sysconfig},home,mnt,opt}
 mkdir -pv /{media/{floppy,cdrom},srv,var}
 install -dv -m 0750 /root
-install -dv -m 1777 /tmp /var/tmp
+install -dv -m 1777 /var/tmp
 mkdir -pv /usr/{,local/}{bin,include,lib,sbin,src}
 mkdir -pv /usr/{,local/}share/{color,dict,doc,info,locale,man}
 mkdir -v  /usr/{,local/}share/{misc,terminfo,zoneinfo}

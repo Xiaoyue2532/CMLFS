@@ -1,4 +1,4 @@
-# Stage1: Texinfo
+# Chroot: texinfo
 # Build and install under chroot
 
 # Configure source with clang

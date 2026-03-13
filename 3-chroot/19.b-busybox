@@ -1,0 +1,14 @@
+# Chroot: busybox
+# Build under chroot
+
+patch -Np1 -i ../patches/busybox-cmlfs/busybox-change-to-llvm-clang.patch
+
+# Generate a default config
+make defconfig
+make menuconfig
+# Uncheck:
+# Applets -> Networking Utilities -> tc (8.3 kb)
+
+# Build and install to toolchain
+make -j`nproc --all`
+cp busybox /llvmtools/bin/getopt

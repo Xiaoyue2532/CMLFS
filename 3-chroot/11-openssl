@@ -1,4 +1,4 @@
-# Final System: OpenSSL
+# Chroot: openssl
 # Build & install under chroot
 
 # Configure source with clang

@@ -1,4 +1,4 @@
-# Stage1: Perl
+# Chroot: Perl
 # Build and install under chroot
 
 # Configure source to use clang, llvm-{ar,nm}, and 

@@ -2,29 +2,13 @@
 # Build and install under chroot
 
 # Configure source with clang
-./bootstrap \
+./configure \
     --prefix=/llvmtools \
-    --mandir=/share/man \
-    --docdir=/share/doc/cmake-4.0.3 \
-    --no-system-jsoncpp \
-    --no-system-librhash \
-    --no-system-curl \
-    --no-system-libarchive \
-    --no-system-nghttp2 \
-    --no-system-expat \
-    --no-system-zlib \
-    --no-system-zstd \
-    --no-system-libuv \
-    --parallel=`nproc --all` \
-    -- \
-    -DCMAKE_USE_OPENSSL=OFF \
-    -DBUILD_CursesDialog=ON \
-    -DCURSES_CURSES_LIBRARY=/llvmtools/lib/libcursesw.so \
-    -DCURSES_EXTRA_LIBRARY=/llvmtools/lib/libtinfow.so \
-    -DCURSES_FORM_LIBRARY=/llvmtools/lib/libformw.so \
-    -DCURSES_INCLUDE_PATH=/llvmtools/include/ncursesw \
-    -DCURSES_NCURSES_LIBRARY=/llvmtools/lib/libncursesw.so
-
+    --parallel=`nproc --all`
 
 # Build and install to toolchain
 make -j`nproc --all` && make install
+
+# Release build use optimize level 3 by default, which is memory-consuming and slow for LLVM building.
+# nano $CMLFS/llvmtools/share/cmake-4.2/Modules/Compiler/GNU.cmake
+# string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O3") -> string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O2")
