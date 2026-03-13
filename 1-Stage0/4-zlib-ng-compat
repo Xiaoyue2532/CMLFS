@@ -1,13 +1,20 @@
 # llvmtools: zlib-ng
 # Build and install as cmlfs
 
-CC=x86_64-pc-linux-musl-gcc \
-CXX=x86_64-pc-linux-musl-g++ \
-./configure \
-    --prefix=/llvmtools \
-    --libdir=/llvmtools/lib \
-    --zlib-compat
+# Configure
+cmake \
+    -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=/llvmtools \
+    -DCMAKE_INSTALL_LIBDIR=lib \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_C_COMPILER="x86_64-pc-linux-musl-gcc" \
+    -DCMAKE_CXX_COMPILER="x86_64-pc-linux-musl-g++" \
+    -DZLIB_COMPAT=ON \
+    -DWITH_GTEST=OFF \
+    ../
 
-make -j`nproc --all` && make install
+# Build and install to llvmtools
+ninja && ninja install/strip
 
+# Create a compability symbol link
 ln -sv libz.so.1.3.1.zlib-ng /llvmtools/lib/libz.so.1.3.1

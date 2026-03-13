@@ -89,7 +89,7 @@ cp -ar CLANG/* /
 echo "int main(){}" > dummy.c
 /usr/bin/clang dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /lib'
-# Shoud output:
+# Should output:
 # [Requesting program interpreter: /lib/ld-musl-x86_64.so.1
 
 # Check if the correct start files are used

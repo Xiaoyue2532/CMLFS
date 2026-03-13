@@ -7,7 +7,7 @@
     --prefix=/ \
     --target=x86_64-pc-linux-musl
 
-# Buid and install
+# Build and install
 make -j`nproc --all` && make DESTDIR=/llvmtools install
 # musl sometimes don't install headers, if recompile do not make changes
 # you may need to reinstall some header files manually

@@ -1,8 +1,8 @@
---- mussel/mussel.sh.orig	2024-03-25 15:14:52.854404082 -0500
-+++ mussel/mussel.sh	2024-03-25 15:21:52.216386543 -0500
-@@ -814,6 +814,22 @@
-   --host=$XTARGET \
-   --prefix=/usr >> $MLOG 2>&1
+--- mussel/mussel	2026-03-13 02:17:02.340155242 +0800
++++ mussel/mussel	2026-03-13 02:18:23.200754752 +0800
+@@ -1000,6 +1000,22 @@
+   --prefix="" \
+   --disable-wrapper >> "$MLOG" 2>&1
  
 +printf -- "${BLUEC}..${NORMALC} Adding assembler link if needed ...\n"
 +if [ -e $MPREFIX/bin/$XTARGET-ar ]
@@ -22,4 +22,4 @@
 +
  printf "${BLUEC}..${NORMALC} Building musl...\n"
  $MAKE \
-   AR=$XTARGET-ar \
+   AR="$XTARGET-ar" \

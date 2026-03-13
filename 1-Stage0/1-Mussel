@@ -20,7 +20,7 @@ patch -Np1 -i ../patches/mussel-add-missing-symlinks.patch
 
 # Build toolchain. Amend PATH to include /cgnutools/bin
 # o Omit -p if not building in parallel to use all the host's CPU cores
-sudo PATH=“/cgnutools/bin:$PATH“ ./mussel x86_64 -l -o -k -p -g -T 'pc'
+sudo PATH="/cgnutools/bin:$PATH" ./mussel x86_64 -l -o -k -p -g -T 'pc'
 
 # Make sure cgnutools is owned by cmlfs
 sudo chown -vR cmlfs $CMLFS/cgnutools

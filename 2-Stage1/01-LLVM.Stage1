@@ -3,29 +3,23 @@
 #
 # o Reuse llvm-project source tree from before
 
-# no need to revert unwind.h
-# MUST NOT use export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib"
-# or /cgnutools/lib/libLLVM.so will prior to build/lib/libLLVM.so
-# which cause llvm-runtime build failure
+# in stage1, there is no unwind headers in /llvmtools
+# - libunwind/include/unwind.h: <__libunwind_config.h> -> "__libunwind_config.h"
+# - libunwind/include/unwind.h: <unwind_itanium.h> -> "unwind_itanium.h"
 
-# currently -fPIC is not necessary
+# -fPIC is not necessary
 # export CFLAGS="-fPIC "
+# export CXXFLAGS=$CFLAGS
+export LDFLAGS="-Wl,-z,stack-size=2097152 "
 
-# optional harden flags
-# chimeralinux patch set -fstack-protector-strong as default
-# openharmony fortify only supports clang
-export CFLAGS="-D_FORTIFY_SOURCE=2 -fstack-clash-protection -fcf-protection "
-export CXXFLAGS=$CFLAGS
-
-# Release mode use O3 as default
 cmake \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="/llvmtools" \
-    -DCMAKE_C_FLAGS_RELEASE="-O2 -pipe" \
-    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -pipe" \
     -DCMAKE_C_COMPILER="clang" \
+    -DCMAKE_C_COMPILER_LAUNCHER="sccache" \
     -DCMAKE_CXX_COMPILER="clang++" \
+    -DCMAKE_CXX_COMPILER_LAUNCHER="sccache" \
     -DCMAKE_AR="/cgnutools/bin/llvm-ar" \
     -DCMAKE_NM="/cgnutools/bin/llvm-nm" \
     -DCMAKE_RANLIB="/cgnutools/bin/llvm-ranlib" \
@@ -33,9 +27,10 @@ cmake \
     -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
-    -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+    -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
     -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_ORC=OFF \
     -DCOMPILER_RT_BUILD_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
@@ -54,12 +49,10 @@ cmake \
     -DLIBCXX_USE_COMPILER_RT=ON \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
-    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
     -DLLVM_ENABLE_LIBEDIT=OFF \
     -DLLVM_ENABLE_LIBPFM=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF \
     -DLLVM_ENABLE_PROJECTS="clang;lld" \
     -DLLVM_ENABLE_RTTI=ON \
@@ -67,6 +60,7 @@ cmake \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_ENABLE_ZSTD=OFF \
     -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_INCLUDE_BENCHMARKS=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="Native;host" \
     -DLLVM_TARGET_ARCH="host" \
@@ -74,8 +68,8 @@ cmake \
     -DZLIB_LIBRARY_RELEASE="/llvmtools/lib/libz.so" \
     ../llvm
 
-# no need to worry LLVM_ENABLE_LLD and LIBCXXABI_ENABLE_STATIC_UNWINDER
-# STATIC_UNWINDER is not necessary
+# if LLVM_ENABLE_LIBCXX=ON, you may see unused option -stdlib=libc++
+# LIBCXXABI_ENABLE_STATIC_UNWINDER and LLVM_ENABLE_LLD are not necessary
 
 # compile
 ninja
@@ -98,7 +92,7 @@ ninja -C build # ............ 508 .......................... PASS
 ninja install/strip
 
 # Clear variables used in the CMake invocation:
-unset CFLAGS CXXFLAGS
+unset CFLAGS CXXFLAGS LDFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
 export PATH="/llvmtools/bin:$PATH"
@@ -108,7 +102,7 @@ echo "int main(void) {}" > dummy.c
 /llvmtools/bin/clang \
     dummy.c -v -Wl,--verbose &> dummy.log
 llvm-readelf -l a.out | grep ': /llvmtools'
-# Shoud output:
+# Should output:
 # [Requesting program interpreter: /llvmtools/lib/ld-musl-x86_64.so.1
 
 # Check if the correct start files are used
@@ -206,7 +200,7 @@ llvm-readelf -d /llvmtools/lib/libc++.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
 llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 # Shared library: [libc.so]
-llvm-readelf -d /llvmtools/lib/libLLVM.so.20.1 | grep Shared | cut -b 37-
+llvm-readelf -d /llvmtools/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libc++.so.1]
 # Shared library: [libc++abi.so.1]
