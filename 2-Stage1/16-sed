@@ -1,5 +1,5 @@
-# Stage1: Gzip
-# Build and install as cmlfs
+# Stage1: Sed 
+# Build by cmlfs
 
 # Configure source with clang
 AS=clang CC=clang CXX=clang++ \
@@ -8,8 +8,6 @@ READELF=llvm-readelf RANLIB=llvm-ranlib \
 SIZE=llvm-size STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
-    --build=x86_64-pc-linux-musl \
-    --host=x86_64-pc-linux-musl \
     --prefix=/llvmtools
 
 # Build and install to toolchain

@@ -1,11 +1,12 @@
 # Stage1: Coreutils
 # Build and install as cmlfs
 
-# GNU Coreutils >=9.7 cannot be built
-
-# [Don't] Re-create configure script 
-# [ ... it usually fails]
-#autoreconf -vif
+# coreutils >= 9.7 once had build errors, 
+# stating that gnulib could not compile.
+# This issue also occurred in m4. 
+# However, this build did not encounter such problems.
+# If you do, you might consider restarting the build process, 
+# as something may have gone wrong somewhere.
 
 # Cross Compiling the configure script 
 # does not does not determine the correct 
@@ -22,9 +23,11 @@ EOF
 # sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 
 # Configure source with clang
-CC=clang CXX=clang++ LD=ld.lld \
-AR=llvm-ar AS=llvm-as NM=llvm-nm \
-READELF=llvm-readelf RANLIB=llvm-ranlib STRIP=llvm-strip \
+# CFLAGS="-lfts "
+AS=clang CC=clang CXX=clang++ \
+AR=llvm-ar LD=ld.lld NM=llvm-nm \
+READELF=llvm-readelf RANLIB=llvm-ranlib \
+SIZE=llvm-size STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/llvmtools \

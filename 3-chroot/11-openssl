@@ -1,18 +1,16 @@
 # Final System: OpenSSL
 # Build & install under chroot
 
-# Configure source to install in /opt/openssl
-./config \
+# Configure source with clang
+# openssl-3.6.1 looks for gcc
+CC=clang \
+./Configure \
     --prefix=/llvmtools \
     --openssldir=/llvmtools/etc/ssl \
     --libdir=lib \
     shared \
     zlib-dynamic \
-    enable-ktls \
-    -Wa,--noexecstack
+    enable-ktls
 
-# Compile
-make -j`nproc --all`
-
-# Install to /opt
-make install
+# Build and install to toolchain
+make -j`nproc --all` && make install

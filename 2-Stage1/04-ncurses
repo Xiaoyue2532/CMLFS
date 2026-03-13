@@ -4,9 +4,10 @@
 # Ensure gawk exist on the host
 mkdir build
 pushd build
-    CC=clang CXX=clang++ LD=ld.lld \
-    AR=llvm-ar AS=llvm-as NM=llvm-nm \
-    READELF=llvm-readelf RANLIB=llvm-ranlib STRIP=llvm-strip \
+    AS=clang CC=clang CXX=clang++ \
+    AR=llvm-ar LD=ld.lld NM=llvm-nm \
+    READELF=llvm-readelf RANLIB=llvm-ranlib \
+    SIZE=llvm-size STRIP=llvm-strip \
     OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
     ../configure AWK=gawk
     make -C include -j`nproc --all`
@@ -14,12 +15,14 @@ pushd build
 popd
 
 # Build
-CC=clang CXX=clang++ LD=ld.lld \
-AR=llvm-ar AS=llvm-as NM=llvm-nm \
-READELF=llvm-readelf RANLIB=llvm-ranlib STRIP=llvm-strip \
+AS=clang CC=clang CXX=clang++ \
+AR=llvm-ar LD=ld.lld NM=llvm-nm \
+READELF=llvm-readelf RANLIB=llvm-ranlib \
+SIZE=llvm-size STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/llvmtools \
+    --enable-overwrite \
     --host=x86_64-pc-linux-musl \
     --build=x86_64-pc-linux-musl \
     --with-shared \
@@ -29,6 +32,9 @@ OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
     --without-ada \
     --disable-stripping \
     AWK=gawk
+# if you find "include directory: /llvmtools/include/ncursesw"
+# add --enable-overwrite and reconfigure
+# notice if "include directory: /llvmtools/include"
 
 # Install to llvmtools
 make -j`nproc --all` && make TIC_PATH=$(pwd)/build/progs/tic install
@@ -40,6 +46,4 @@ ln -sv libncurses.so /llvmtools/lib/libtinfo.so
 ln -sv libncurses.so /llvmtools/lib/libtinfow.so
 
 sed -e 's/^#if.*XOPEN.*$/#if 1/' \
-    -i /llvmtools/include/ncursesw/curses.h
-mv /llvmtools/include/ncursesw/* /llvmtools/include/
-rm -r /llvmtools/include/ncursesw
+    -i /llvmtools/include/curses.h

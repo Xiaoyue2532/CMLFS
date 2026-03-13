@@ -15,8 +15,10 @@ patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.p
 export CFLAGS="-fPIC -Wl,-rpath=/cgnutools/lib "
 export CXXFLAGS=$CFLAGS
 
-# musl has a small stack
+# musl has a small stack, explicitly set it to 2MB
 # https://github.com/gentoo/musl/issues/297
+# Gentoo set LLD's stack size to 2MB, while ChimeraLinux patches llvm source to set 8MB stack size globally.
+# I choose to set the stack size of the whole llvm toolchain to 2MB.
 export LDFLAGS="-Wl,-z,stack-size=2097152 "
 # You can verify with:
 # readelf -a ./llvm-min-tblgen | grep "stack size:"
@@ -26,6 +28,8 @@ export LDFLAGS="-Wl,-z,stack-size=2097152 "
 # Release build use optimize level 3 by default, which is memory-consuming and slow for building.
 # sudo nano /usr/share/cmake/Modules/Compiler/GNU.cmake
 # string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O3") -> string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O2")
+
+# I just wanna try if we can build CMLFS without libatomic-chimera.
 
 cmake \
     -G Ninja \
@@ -118,8 +122,8 @@ EOF
 # Add a search path for the dynamic linker/loader in llvmtools:
 echo "/cgnutools/lib" >> /llvmtools/etc/ld-musl-x86_64.path
 
-# disable gcc
-mv /cgnutools/lib/gcc{,-disabled}
+# Disable cross-gcc ... will use stage0 clang instead
+mv -v /cgnutools/lib/gcc{,-disabled}
 
 # Test stage0 Clang
 echo "int main(void) {}" > dummy.c
@@ -178,6 +182,7 @@ EOF
 # Check for errors during compile or link:
 grep error:  atomics-test.log
 # Should return nothing if there are no errors.
+# it seems that no libatomic.so doesn't matter.
 
 # Test if stage0 clang support C++11
 cat > cxx11-test.cpp << "EOF"

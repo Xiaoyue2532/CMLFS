@@ -24,14 +24,15 @@ case $(uname -m) in
               export   MCA="arm" ;;
 esac
 
-export CC=clang
-export CXX=clang++
-export LD=ld.lld
-export AR=llvm-ar
-export AS=llvm-as
-export NM=llvm-nm
-export READELF=llvm-readelf
-export RANLIB=llvm-ranlib
-export STRIP=llvm-strip
-export OBJCOPY=llvm-objcopy
-export OBJDUMP=llvm-objdump
+ln -sf /llvmtools/bin/clang-21 /root/.bin/as
+ln -sf /llvmtools/bin/clang-21 /root/.bin/cc
+ln -sf /llvmtools/bin/clang-21 /root/.bin/c++
+ln -sf /llvmtools/bin/ld.lld /root/.bin/ld
+ln -sf /llvmtools/bin/llvm-ar /root/.bin/ar
+ln -sf /llvmtools/bin/llvm-nm /root/.bin/nm
+ln -sf /llvmtools/bin/llvm-objcopy /root/.bin/objcopy
+ln -sf /llvmtools/bin/llvm-objdump /root/.bin/objdump
+ln -sf /llvmtools/bin/llvm-ranlib /root/.bin/ranlib
+ln -sf /llvmtools/bin/llvm-readelf /root/.bin/readelf
+ln -sf /llvmtools/bin/llvm-size /root/.bin/size
+ln -sf /llvmtools/bin/llvm-strip /root/.bin/strip

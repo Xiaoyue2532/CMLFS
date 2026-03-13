@@ -1,12 +1,18 @@
 # Stage1: M4 
 # Build and install as cmlfs
 
-# m4 >= 1.4.20 cannot be built
+# m4 >= 1.4.20 once had build errors, 
+# stating that gnulib could not compile.
+# This issue also occurred in coreutils. 
+# However, this build did not encounter such problems.
+# If you do, you might consider restarting the build process, 
+# as something may have gone wrong somewhere.
 
 # Configure source with clang
-CC=clang CXX=clang++ LD=ld.lld \
-AR=llvm-ar AS=llvm-as NM=llvm-nm \
-READELF=llvm-readelf RANLIB=llvm-ranlib STRIP=llvm-strip \
+AS=clang CC=clang CXX=clang++ \
+AR=llvm-ar LD=ld.lld NM=llvm-nm \
+READELF=llvm-readelf RANLIB=llvm-ranlib \
+SIZE=llvm-size STRIP=llvm-strip \
 OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 ./configure \
     --prefix=/llvmtools \

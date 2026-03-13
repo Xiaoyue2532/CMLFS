@@ -10,7 +10,14 @@
 # -fPIC is not necessary
 # export CFLAGS="-fPIC "
 # export CXXFLAGS=$CFLAGS
+
+# musl has a small stack, explicitly set it to 2MB
 export LDFLAGS="-Wl,-z,stack-size=2097152 "
+# LLD don't produce .note.gnu.property section, you can look for GNU_STACK instead:
+# llvm-readelf -l llvm-tblgen | grep -A1 GNU_STACK
+#   GNU_STACK      0x000000 0x0000000000000000 0x0000000000000000 0x000000 0x200000 RW  0x0
+#   NOTE           0x000304 0x0000000000000304 0x0000000000000304 0x000024 0x000024 R   0x4
+# 0x200000 in hex is 2*2^20 in decimal, which means llvm binaries have a 2MB stack.
 
 cmake \
     -G Ninja \
@@ -92,7 +99,8 @@ ninja -C build # ............ 508 .......................... PASS
 ninja install/strip
 
 # Clear variables used in the CMake invocation:
-unset CFLAGS CXXFLAGS LDFLAGS
+# unset CFLAGS CXXFLAGS LDFLAGS
+unset LDFLAGS
 
 # cgnutools has served it's purpose. Remove from $PATH
 export PATH="/llvmtools/bin:$PATH"
@@ -125,10 +133,9 @@ grep ld.lld:  dummy.log
 # ld.lld: /llvmtools/lib/Scrt1.o
 # ld.lld: /llvmtools/lib/crti.o
 # ld.lld: /llvmtools/lib/clang/21/lib/linux/clang_rt.crtbegin-x86_64.o
-# ld.lld: /tmp/dummy-35ed76.o
+# ld.lld: /tmp/dummy-077cec.o
 # ld.lld: /llvmtools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /llvmtools/lib/libunwind.so
-# ld.lld: /llvmtools/lib/libatomic.so
 # ld.lld: /llvmtools/lib/libc.so
 # ld.lld: /llvmtools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /llvmtools/lib/libunwind.so

@@ -1,2 +1,0 @@
-CC=clang prefix=/llvmtools make -j16
-CC=clang prefix=/llvmtools make install
