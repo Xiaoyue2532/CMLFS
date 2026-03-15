@@ -20,7 +20,6 @@ chroot --userspec=1000:1000 "$CMLFS" /llvmtools/bin/env -i \
     HOME=/home/arch \
     TERM="$TERM" \
     PS1='(chroot) [\u@\h \W]\$ ' \
-    PATH=/home/arch/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    PATH="/home/arch/.bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin" \
     PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
     /llvmtools/bin/bash
-    

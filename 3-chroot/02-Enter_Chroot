@@ -5,7 +5,7 @@ chroot "$CMLFS" /llvmtools/bin/env -i \
     HOME=/root \
     TERM="$TERM" \
     PS1='(chroot) [\u@\h \W]\$ ' \
-    PATH=/root/.bin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin \
+    PATH="/root/.bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin:/llvmtools/bin" \
     PKG_CONFIG_PATH=/llvmtools/lib/pkgconfig \
     /llvmtools/bin/bash
 
