@@ -1,0 +1,28 @@
+# cgnutools: compiler-rt
+# Build as cmlfs user
+
+# Build musl needs libclang_rt.builtins.a under /cgnutools
+# build minimal compiler-rt
+cmake \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/cgnutools/lib/clang/21/ \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_C_COMPILER_TARGET=x86_64-pc-linux-musl \
+    -DCMAKE_C_COMPILER_WORKS=1 \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_CXX_COMPILER_TARGET=x86_64-pc-linux-musl \
+    -DCMAKE_CXX_COMPILER_WORKS=1 \
+    -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
+    -DCOMPILER_RT_BUILD_CRT=ON \
+    -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_ORC=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    ../compiler-rt
+
+# Build and install
+ninja && ninja install/strip

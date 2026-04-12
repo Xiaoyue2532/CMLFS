@@ -1,0 +1,35 @@
+# llvmtools: Musl libc
+# Build as cmlfs
+
+# Configure with freshly built GCC
+CC=clang AR=llvm-ar RANLIB=llvm-ranlib \
+LIBCC=/cgnutools/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a \
+./configure \
+    --prefix=/llvmtools \
+    --host=x86_64-pc-linux-gnu \
+    --disable-wrapper
+
+# Build and install
+make -j`nproc --all` && make install
+
+# Fix dynamic loader symlink, which may cause executables "Permission Denied"
+rm -v /llvmtools/lib/ld-musl-x86_64.so.1
+ln -sv libc.so /llvmtools/lib/ld-musl-x86_64.so.1
+
+# Stage1 clang expects headers in /llvmtools/usr/include
+# May need a patch clang source to change that...
+# o clang/lib/Driver/ToolChains/Linux.cpp
+# o clang/lib/Driver/ToolChains/Gnu.cpp
+# For now, create a link.
+# ln -sv . /llvmtools/usr
+
+# Create a symlink that can be used to print
+# the required shared objects of a program or
+# shared object
+mkdir /llvmtools/{etc,bin}
+ln -sv ../lib/libc.so /llvmtools/bin/ldd
+
+# Configure the dynamic linker
+cat > /llvmtools/etc/ld-musl-x86_64.path <<EOF
+/llvmtools/lib
+EOF

@@ -39,11 +39,11 @@ OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
 # Install to llvmtools
 make -j`nproc --all` && make TIC_PATH=$(pwd)/build/progs/tic install
 
-# Some packages may not configure with the curses library
-# in llvmtools. Create a compatibility links:
-ln -sv libncursesw.so /llvmtools/lib/libncurses.so
-ln -sv libncurses.so /llvmtools/lib/libtinfo.so
-ln -sv libncurses.so /llvmtools/lib/libtinfow.so
+# # Some packages may not configure with the curses library
+# # in llvmtools. Create a compatibility links:
+# ln -sv libncursesw.so /llvmtools/lib/libncurses.so
+# ln -sv libncurses.so /llvmtools/lib/libtinfo.so
+# ln -sv libncurses.so /llvmtools/lib/libtinfow.so
 
 sed -e 's/^#if.*XOPEN.*$/#if 1/' \
     -i /llvmtools/include/curses.h

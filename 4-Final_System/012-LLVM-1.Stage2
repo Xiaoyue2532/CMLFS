@@ -7,10 +7,7 @@
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.restore.patch 
 patch -Np1 -i ../../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.restore.patch
 
-# -fPIC is not necessary
-# export CFLAGS="-fPIC "
-# export CXXFLAGS=$CFLAGS
-
+# musl has a small stack, explicitly set it to 2MB
 export LDFLAGS="-Wl,-z,stack-size=2097152 "
 
 # Configure source [to build all of LLVM]
@@ -28,7 +25,6 @@ cmake \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
-    -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
@@ -36,14 +32,13 @@ cmake \
     -DCOMPILER_RT_DEFAULT_TARGET_TRIPLE="x86_64-pc-linux-musl" \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_USE_LLVM_UNWINDER=ON \
-    -DDEFAULT_SYSROOT="/usr" \
+    -DDEFAULT_SYSROOT="/" \
     -DENABLE_LINKER_BUILD_ID=ON \
     -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
-    -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
     -DLIBCXX_USE_COMPILER_RT=ON \
     -DLIBUNWIND_INSTALL_HEADERS=ON \
@@ -241,7 +236,6 @@ llvm-readelf -d /usr/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libzstd.so.1]
 # Shared library: [libc++.so.1]
-# Shared library: [libc++abi.so.1]
 # Shared library: [libc.so]
 
 # If all is well, clean up

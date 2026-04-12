@@ -1,0 +1,22 @@
+# llvmtools: musl headers
+# Build as cmlfs user
+
+# Fix musl-1.2.6 CVE-2026-6042
+patch -Np1 -i ../../CMLFS/patches/musl-1.2.6/0001-fix-pathological-slowness-incorrect-mappings-in-icon.patch
+
+# Fix musl-1.2.6 CVE-2026-40200
+patch -Np1 -i ../../CMLFS/patches/musl-1.2.6/0001-qsort-fix-leonardo-heap-corruption-from-bug-in-doubl.patch
+patch -Np1 -i ../../CMLFS/patches/musl-1.2.6/0002-qsort-hard-preclude-oob-array-writes-independent-of-.patch
+patch -Np1 -i ../../CMLFS/patches/musl-1.2.6/0003-qsort-fix-shift-UB-in-shl-and-shr.patch
+
+# host option need to be correctly specified
+# especially when it is cross compiling
+CC=clang \
+./configure \
+    --prefix=/llvmtools \
+    --host=x86_64-pc-linux-musl
+
+# Only install headers
+make install-headers
+
+# musl headers are installed to /llvmtools/include

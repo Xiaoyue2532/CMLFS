@@ -1,11 +1,7 @@
 # llvmtools: Stage1 clang (with compiler-rt,libcxx,libcxxabi,libunwind,lld)
 # Build as cmlfs
 #
-# o Reuse llvm-project source tree from before
-
-# -fPIC is not necessary
-# export CFLAGS="-fPIC "
-# export CXXFLAGS=$CFLAGS
+# NOTE: Reuse llvm-project source tree from before
 
 # musl has a small stack, explicitly set it to 2MB
 export LDFLAGS="-Wl,-z,stack-size=2097152 "
@@ -15,6 +11,7 @@ export LDFLAGS="-Wl,-z,stack-size=2097152 "
 #   NOTE           0x000304 0x0000000000000304 0x0000000000000304 0x000024 0x000024 R   0x4
 # 0x200000 in hex is 2*2^20 in decimal, which means llvm binaries have a 2MB stack.
 
+# Configure
 cmake \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
@@ -29,7 +26,6 @@ cmake \
     -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
     -DCLANG_DEFAULT_LINKER=lld \
     -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
-    -DCLANG_DEFAULT_PIE_ON_LINUX=ON \
     -DCLANG_DEFAULT_RTLIB=compiler-rt \
     -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
@@ -50,7 +46,6 @@ cmake \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXX_CXX_ABI=libcxxabi \
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
-    -DLIBCXX_HARDENING_MODE=fast \
     -DLIBCXX_HAS_MUSL_LIBC=ON \
     -DLIBCXX_USE_COMPILER_RT=ON \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
@@ -80,31 +75,13 @@ cmake \
 # LIBCXXABI_ENABLE_STATIC_UNWINDER means libc++abi.so doesn't depend on libunwind.so
 # LIBCXX_ENABLE_STATIC_ABI_LIBRARY means libc++.so doesn't depend on libc++abi.so
 
-# compile
-ninja
-
-# For troubleshooting, this is the breakdown of build targets:
-ninja -C build llvm-headers # 202 targets .................. PASS
-ninja -C build llvm-tblgen  #  68 .......................... PASS 
-ninja -C build llvm-lib # .. 1598 .......................... PASS 
-ninja -C build unwind # .... 1370 .......................... PASS 
-ninja -C build compiler-rt # .. 5 .......................... PASS
-ninja -C build builtins # ..... 3 .......................... PASS 
-ninja -C build cxxabi # .... 1051 .......................... PASS 
-ninja -C build cxx # ........ 103 .......................... PASS
-ninja -C build lld # ....................................... PASS
-ninja -C build clang # ..................................... PASS 
-ninja -C build libclang # .... 31 .......................... PASS
-ninja -C build # ............ 508 .......................... PASS
-
-# install to llvmtools
-ninja install/strip
+# compile and install to llvmtools
+ninja && ninja install/strip
 
 # Clear variables used in the CMake invocation:
-# unset CFLAGS CXXFLAGS LDFLAGS
 unset LDFLAGS
 
-# cgnutools has served it's purpose. Remove from $PATH
+# cgnutools toolchain has served it's purpose. Remove from $PATH
 export PATH="/llvmtools/bin:$PATH"
 
 # Test stage1 Clang
@@ -169,7 +146,7 @@ grep -B2 -A2 '^ /llvmtools' atomics-test.log
 # It should output this order:
 # #include <...> search starts here:
 #  /llvmtools/bin/../include/c++/v1
-#  /llvmtools/usr/include
+#  /llvmtools/include
 #  /llvmtools/lib/clang/21/include
 # End of search list.
 # NOTE: /llvmtools/include/c++/v1 should be searched first.
@@ -211,7 +188,6 @@ llvm-readelf -d /llvmtools/lib/libc++abi.so.1.0 | grep Shared | cut -b 37-
 llvm-readelf -d /llvmtools/lib/libLLVM.so.21.1 | grep Shared | cut -b 37-
 # Shared library: [libz.so.1]
 # Shared library: [libc++.so.1]
-# Shared library: [libc++abi.so.1]
 # Shared library: [libc.so]
 
 # If all is well, clean up

@@ -3,6 +3,8 @@
 # Must use same version for llvmtools 
 # and final system. 
 
+# astron.com is broken, you may need to find file tarball elsewhere
+
 # Configure source
 ./configure \
     --prefix=/llvmtools \

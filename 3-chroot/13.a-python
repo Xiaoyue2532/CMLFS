@@ -5,6 +5,8 @@
 find ../../cports/main/python/patches/ -type f -exec patch -Np1 -i {} \;
 
 # Configure source with clang
+# Currently we don't have clang_rt.profile, PGO cannot be done
+CC=clang CXX=clang++ \
 ./configure \
     --prefix=/llvmtools \
     --enable-shared \

@@ -1,18 +1,16 @@
 # llvmtools: Kernel Headers
 # Build as cmlfs user
 
-# If host uses clang instead of GCC, prefix each make 
-# command with LLVM=1
-
-# Build the headers
-make mrproper
-make ARCH=x86_64 headers
-
-# Install the headers for stage 0 clang
-sudo mkdir -pv /llvmtools/include
-sudo chown -vR 1000:1000 $CMLFS/llvmtools
-cp -rv usr/include/* /llvmtools/include/
-find /llvmtools/include -type f ! -name '*.h' -delete
+# In fact, installing kernel headers doesn't require LLVM=1 option
+# headers_install needs rsync
 
 # Clean the source
 make mrproper
+
+# Install kernel headers
+make \
+    ARCH=x86_64 \
+    INSTALL_HDR_PATH=/llvmtools \
+    headers_install
+
+# Kernel headers are installed to /llvmtools/include

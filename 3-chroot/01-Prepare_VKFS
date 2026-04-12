@@ -16,5 +16,5 @@ mount -vt sysfs sysfs $CMLFS/sys
 mount -vt tmpfs tmpfs $CMLFS/run
 mount -vt tmpfs tmpfs $CMLFS/tmp
 if [ -h $CMLFS/dev/shm ]; then
-  mkdir -pv $CMLFS/$(readlink $CMLFS/dev/shm)
+    mkdir -pv $CMLFS/$(readlink $CMLFS/dev/shm)
 fi

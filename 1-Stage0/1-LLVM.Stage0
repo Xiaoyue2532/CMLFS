@@ -1,0 +1,53 @@
+# llvmtools: Stage0 LLVM (llvm + clang + lld)
+# Build as cmlfs
+
+# Original llvm source tree, no need to apply patches from ChimeraLinux
+
+# Force clang to use dynamic linux loader in /llvmtools
+patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/modify-toolchain-dynamic-loader.llvmtools.patch
+patch -Np1 -i ../CMLFS/patches/llvm-cmlfs/modify-test-dynamic-loader.llvmtools.patch
+
+# Install llvm from Arch Linux distro
+sudo pacman -S clang llvm lld compiler-rt libc++ libc++abi
+# Install llvm-libunwind, not non-gnu libunwind
+paru -S llvm-libunwind
+
+# Write a configuration file
+cat > /usr/bin/x86_64-unknown-linux-gnu.cfg << EOF
+-fuse-ld=lld
+-rtlib=compiler-rt
+-stdlib=libc++
+-unwindlib=libunwind
+EOF
+
+# Build a basic llvm toolchain
+cmake \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release  \
+    -DCMAKE_INSTALL_PREFIX=/cgnutools \
+    -DCMAKE_C_COMPILER="clang" \
+    -DCMAKE_C_COMPILER_LAUNCHER="sccache" \
+    -DCMAKE_CXX_COMPILER="clang++" \
+    -DCMAKE_CXX_COMPILER_LAUNCHER="sccache" \
+    -DCMAKE_AR="/usr/bin/llvm-ar" \
+    -DCMAKE_NM="/usr/bin/llvm-nm" \
+    -DCMAKE_RANLIB="/usr/bin/llvm-ranlib" \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
+    -DDEFAULT_SYSROOT="/llvmtools" \
+    -DENABLE_LINKER_BUILD_ID=ON \
+    -DLLVM_BUILD_LLVM_DYLIB=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;lld" \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_HOST_TRIPLE="x86_64-pc-linux-musl" \
+    -DLLVM_INCLUDE_BENCHMARKS=OFF \
+    -DLLVM_INSTALL_UTILS=ON \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_TARGETS_TO_BUILD="Native;host" \
+    ../llvm
+
+# if you want to cross compile, change LLVM_TARGETS_TO_BUILD and LLVM_HOST_TRIPLE
+ninja && ninja install/strip

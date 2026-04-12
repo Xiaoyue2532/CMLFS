@@ -2,7 +2,6 @@
 # Build & install under chroot
 
 # Configure source with clang
-# openssl-3.6.1 looks for gcc
 CC=clang \
 ./Configure \
     --prefix=/llvmtools \

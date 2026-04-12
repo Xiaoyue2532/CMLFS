@@ -6,8 +6,6 @@
 ./Configure -des -Dprefix=/llvmtools \
     -Dlibs=-lm -Uloclibpth -Ulocincpth \
     -Dcc=clang \
-    -Dar="/llvmtools/bin/llvm-ar" \
-    -Dnm="/llvmtools/bin/llvm-nm"  \
     -Dlibc="/llvmtools/lib/libc.so" \
     -Dcccdlflags='-fPIC' -Dccdlflags='-rdynamic'
 
@@ -16,5 +14,5 @@ make -j`nproc --all`
 
 # Only a few of the utilities and libraries need to be installed to toolchain
 cp -v perl cpan/podlators/scripts/pod2man /llvmtools/bin
-mkdir -pv /llvmtools/lib/perl5/5.42.1
-cp -Rv lib/* /llvmtools/lib/perl5/5.42.1
+mkdir -pv /llvmtools/lib/perl5/5.42.2
+cp -Rv lib/* /llvmtools/lib/perl5/5.42.2

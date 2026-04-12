@@ -104,14 +104,14 @@ aria2c --auto-file-renaming=false --continue=true --allow-overwrite=false -i sou
 
 ## Current Method
 
-Build 'cross-tools' with [Mussel](https://github.com/firasuke/mussel) to cross-compile a stage0 LLVM+clang. This stage0 clang will still link to `libgcc_s` [in cgnutools] but will later be used to build a stage1 clang free of `libbgcc_s`. The goal is to build clang+friends with clang and not GCC.
+[dslm4515/CMLFS](https://github.com/dslm4515/CMLFS) need us to bootstrap a musl gcc toolchain with mussel.
+But why we do not use in-place llvm toolchain? Or why we do not bootstrap a llvm toolchain with distro-provided llvm?
 
 * Some packages can be built once to be used by the toolchain [llvmtools] and the final system, but will be built twice to make it easy to implement a package managment system [which is outside the scope of this project]. 
 
 <ol>
-    <li>Bootstrap build of cgnutools with mussel</li>
-    <li>Use mussel-built toolchain (cgnutools) to build stage0 LLVM+clang</li>
-    <li>Use cgnutools to build stage1 LLVM+clang with sysroot at llvmtools with stage0 LLVM+clang</li>
+    <li>Bootstrap build of stage0 toolchain (cgnutools) with distro-provided llvm toolchain</li>
+    <li>Use stage0 toolchain (cgnutools) to build stage1 LLVM+clang</li>
     <li>Build enough of llvmtools to enter a chroot with stage1 LLVM+clang</li>
     <li>Build the rest of llvmtools under chroot </li>
     <li>Build final system with llvmtools </li>
@@ -127,6 +127,7 @@ Build 'cross-tools' with [Mussel](https://github.com/firasuke/mussel) to cross-c
 ## Change log
 
 <ul>
+    <li>21.1.0: For now we bootstrap stage0 llvm toolchain with llvm </li>
     <li>21.0.0: Upgraded to LLVM 21.1.8 </li>
     <li>4.0.0: Upgraded to LLVM 17.0.5 </li>
     <li>3.0.0: Upgraded to LLVM-15.0.6. cgnutools is now bootstrapped with mussel. Replaced binutils with elftoolchain. Most of llvmtools will be build under chroot to avoid contamination from host. </li>
@@ -143,6 +144,7 @@ Build 'cross-tools' with [Mussel](https://github.com/firasuke/mussel) to cross-c
 
 ## Projects of Interest
 <ul>
+    <li> [Original work dslm4515/CMLFS](https://github.com/dslm4515/CMLFS)</li>
     <li> [Mussel](https://github.com/firasuke/mussel)</li>
     <li> [Musl Linux From Scratch](https://github.com/dslm4515/Musl-LFS) - Based on LFS, but uses Musl instead of Glibc </li>
     <li> [Beyond MLFS](https://github.com/dslm4515/BMLFS) - The Musl version of LFS's BLFS </li>

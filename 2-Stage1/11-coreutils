@@ -1,13 +1,6 @@
 # Stage1: Coreutils
 # Build and install as cmlfs
 
-# coreutils >= 9.7 once had build errors, 
-# stating that gnulib could not compile.
-# This issue also occurred in m4. 
-# However, this build did not encounter such problems.
-# If you do, you might consider restarting the build process, 
-# as something may have gone wrong somewhere.
-
 # Cross Compiling the configure script 
 # does not does not determine the correct 
 # values for the following, Set the values 
@@ -18,9 +11,6 @@ ac_cv_func_syncfs=no
 gl_cv_func_working_mkstemp=yes
 gl_cv_func_working_acl_get_file=yes
 EOF
-
-# Suppress a test which on some machines can loop forever:
-# sed -i '/test.lock/s/^/#/' gnulib-tests/gnulib.mk
 
 # Configure source with clang
 # CFLAGS="-lfts "

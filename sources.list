@@ -1,3 +1,4 @@
+https://astron.com/pub/file/file-5.47.tar.gz
 https://cmake.org/files/v4.3/cmake-4.3.1.tar.gz
 https://cpan.metacpan.org/authors/id/T/TO/TODDR/XML-Parser-2.57.tar.gz
 https://data.iana.org/time-zones/releases/tzcode2026a.tar.gz
@@ -41,7 +42,6 @@ https://github.com/argp-standalone/argp-standalone/archive/refs/tags/1.5.0.tar.g
 https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz
 https://github.com/chimera-linux/musl-fts/archive/refs/tags/v1.2.7-mk2.tar.gz
 https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz
-https://github.com/file/file/archive/refs/tags/FILE5_47.tar.gz
 https://github.com/gavinhoward/bc/releases/download/7.0.3/bc-7.0.3.tar.xz
 https://github.com/libarchive/libarchive/releases/download/v3.8.6/libarchive-3.8.6.tar.xz
 https://github.com/libcheck/check/releases/download/0.15.2/check-0.15.2.tar.gz
@@ -84,6 +84,7 @@ https://www.busybox.net/downloads/busybox-1.36.1.tar.bz2
 https://www.cpan.org/src/5.0/perl-5.42.2.tar.xz
 https://www.greenwoodsoftware.com/less/less-692.tar.gz
 https://www.kernel.org/pub/linux/docs/man-pages/man-pages-6.17.tar.xz
+https://www.kernel.org/pub/linux/kernel/v6.x/linux-6.19.12.tar.xz
 https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/libcap-2.78.tar.xz
 https://www.kernel.org/pub/linux/utils/kbd/kbd-2.9.0.tar.xz
 https://www.kernel.org/pub/linux/utils/kernel/kmod/kmod-34.2.tar.xz

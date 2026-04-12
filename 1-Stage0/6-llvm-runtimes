@@ -1,0 +1,38 @@
+# llvmtools: llvm-runtimes (libc++ & libc++abi & compiler-rt & llvm-libunwind)
+# Build as cmlfs user
+
+cmake \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/llvmtools \
+    -DCMAKE_ASM_COMPILER=clang \
+    -DCMAKE_ASM_COMPILER_TARGET=x86_64-pc-linux-musl \
+    -DCMAKE_C_COMPILER=clang \
+    -DCMAKE_C_COMPILER_TARGET=x86_64-pc-linux-musl \
+    -DCMAKE_C_COMPILER_WORKS=1 \
+    -DCMAKE_CXX_COMPILER=clang++ \
+    -DCMAKE_CXX_COMPILER_TARGET=x86_64-pc-linux-musl \
+    -DCMAKE_CXX_COMPILER_WORKS=1 \
+    -DCOMPILER_RT_BUILD_CRT=ON \
+    -DCOMPILER_RT_BUILD_CTX_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+    -DCOMPILER_RT_BUILD_ORC=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
+    -DCOMPILER_RT_INSTALL_PATH=/llvmtools/lib/clang/21 \
+    -DCXX_SUPPORTS_FNO_EXCEPTIONS_FLAG=1 \
+    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
+    -DLIBCXXABI_USE_COMPILER_RT=ON \
+    -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
+    -DLIBCXX_CXX_ABI=libcxxabi \
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
+    -DLIBCXX_USE_COMPILER_RT=ON \
+    -DLIBCXX_HAS_MUSL_LIBC=ON \
+    -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;libunwind;compiler-rt" \
+    ../runtimes
+
+# Build and install
+ninja && ninja install/strip
