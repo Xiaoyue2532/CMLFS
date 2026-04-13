@@ -9,10 +9,13 @@ make LLVM=1 mrproper
 # Extract the headers
 make LLVM=1 ARCH=x86_64 headers
 
-# There are also some hidden files used by the kernel
+# Install the header to sysroot
+cp -rv usr/include/* /usr/include
+
+# There are also some hidden files used by the kernel 
 # developers and not needed by CMLFS that are removed 
 # from the intermediate directory.
+find /usr/include \( -name '.*' -o -name '.*.cmd' \) -exec rm -vf {} \;
 
-# Install Headers
-cp -rv usr/include/* /usr/include
-find /usr/include -type f \( ! -name *.h \) -delete
+# Remove unneeded makefile
+rm -v /usr/include/Makefile

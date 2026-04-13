@@ -10,5 +10,5 @@
 make -j`nproc --all` && make install
 
 # Release build use optimize level 3 by default, which is memory-consuming and slow for LLVM building.
-# nano $CMLFS/llvmtools/share/cmake-4.2/Modules/Compiler/GNU.cmake
+# nano $CMLFS/llvmtools/share/cmake-4.3/Modules/Compiler/GNU.cmake
 # string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O3") -> string(APPEND CMAKE_${lang}_FLAGS_RELEASE_INIT " -O2")

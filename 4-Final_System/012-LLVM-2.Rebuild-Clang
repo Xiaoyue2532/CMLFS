@@ -118,7 +118,6 @@ grep ld.lld:  dummy.log
 # ld.lld: /tmp/dummy-b69998.o
 # ld.lld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /lib/libunwind.so
-# ld.lld: /lib/libatomic.so
 # ld.lld: /lib/libc.so
 # ld.lld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /lib/libunwind.so

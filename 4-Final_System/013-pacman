@@ -4,8 +4,8 @@
 meson setup \
     --prefix=/usr \
     --buildtype=release \
-    -Dpkg-ext=".pkg.tar.xz" \
-    -Dsrc-ext=".src.tar.xz" \
+    -Dpkg-ext=".pkg.tar.zst" \
+    -Dsrc-ext=".src.tar.zst" \
     -Dsysconfdir="/etc" \
     -Dlocalstatedir="/var" \
     -Ddoc=disabled \

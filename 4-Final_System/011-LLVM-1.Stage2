@@ -72,25 +72,6 @@ cmake \
 # compile (~ 4,048 targets)
 ninja
 
-# If build fails to compile, use below to see what component failed.
-# ninja -C build $TARGET
-# Build target break down (still unsure of order):
-# * Count is based on the x86_64-pc-linux-musl target
-#
-# $TARGET ......... COUNT ........ STATUS
-# llvm-headers ...... 202 ......... PASS
-# llvm-tblgen ........ 68 ......... PASS 
-# llvm-lib ......... 1812 ......... PASS 
-# lld ............... 126 ......... PASS 
-# clang ............ 1181 ......... PASS 
-# builtins ........... 56 ......... PASS
-# cxxabi ........... 1067 ......... PASS 
-# cxx ............... 103 ......... PASS
-# compiler-rt ....... 582 ......... PASS 
-# libclang ........... 31 ......... PASS 
-# unwind .............. 5 ......... PASS
-# <remaining> ....... 530 ......... PASS 
-
 # Install
 ninja install/strip
 
@@ -161,7 +142,6 @@ grep ld:  dummy.log
 # ld.lld: /tmp/dummy-1f0e32.o
 # ld.lld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /lib/libunwind.so
-# ld.lld: /lib/libatomic.so
 # ld.lld: /lib/libc.so
 # ld.lld: /usr/lib/clang/21/lib/linux/libclang_rt.builtins-x86_64.a
 # ld.lld: /lib/libunwind.so
