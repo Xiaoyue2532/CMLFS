@@ -57,7 +57,6 @@ esac
 # Create config for dynamic library loading:
 cat > /etc/ld-musl-x86_64.path <<EOF
 /usr/lib
-/lib
 EOF
 
 # Create compatibility link for i686, as some software, like SMPlayer
@@ -75,7 +74,6 @@ install -v -D -m755 ../../CMLFS/files/ldconfig /usr/sbin/
 chmod -v +x /usr/sbin/ldconfig
 mkdir -pv $BUILD/etc/ld-musl-${CARCH}.d
 cat > $BUILD/etc/ld-musl-${CARCH}.d/default <<EOF
-/lib
 /usr/lib
 EOF
 unset CARCH
